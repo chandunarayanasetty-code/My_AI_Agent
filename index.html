@@ -42,6 +42,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-trans
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .add{padding:16px;display:grid;grid-template-columns:1fr;gap:12px}
 .add[hidden]{display:none}
+[hidden]{display:none !important}
 .add .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .tablebox{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:860px}
@@ -804,7 +805,18 @@ document.addEventListener('change', async e => {
 });
 
 $('toggleAdd').onclick=()=>{ $('addForm').hidden=!$('addForm').hidden; if(!$('addForm').hidden)$('newName').focus(); };
+// Backup and the /code browser only exist on the local Node server.
+const localOnly = (() => {
+  try { return location.protocol === 'file:' || ['localhost', '127.0.0.1', '::1', '[::1]'].includes(location.hostname); }
+  catch (e) { return true; }
+})();
+if (!localOnly) {
+  $('backupBtn').hidden = true;
+  const codeLink = document.querySelector('header a.linkbtn');
+  if (codeLink) codeLink.hidden = true;
+}
 $('backupBtn').onclick = async () => {
+  if (!localOnly) return;
   const btn = $('backupBtn');
   btn.disabled = true;
   try {
