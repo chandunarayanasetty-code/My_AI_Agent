@@ -1,0 +1,13 @@
+{
+  "name": "course-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Course Tracker: local single-page study planner with offline lesson and quiz generation",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

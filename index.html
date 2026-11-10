@@ -1,0 +1,850 @@
+<title>Course Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one wide working table of courses; selecting a row opens its study desk (lesson + quiz) beneath it. */
+:root{
+  --bg:#f6f7f4; --surface:#ffffff; --fg:#1b2420; --muted:#667068; --line:#dde2da;
+  --accent:#1f6f5c; --accent-fg:#ffffff; --accent-soft:#e2f0ea;
+  --good:#2f7d3f; --warn:#b26a00; --bad:#b3372b; --track:#e6eae3;
+  --font-display:'Space Grotesk',system-ui,sans-serif; --font-body:'Inter',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1a211e; --fg:#e6ebe7; --muted:#97a39b; --line:#2b3530;
+  --accent:#58c4a4; --accent-fg:#0c1512; --accent-soft:#1d3029;
+  --good:#6cc47c; --warn:#e0a24a; --bad:#ec7c70; --track:#2a332f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1a211e; --fg:#e6ebe7; --muted:#97a39b; --line:#2b3530;
+  --accent:#58c4a4; --accent-fg:#0c1512; --accent-soft:#1d3029;
+  --good:#6cc47c; --warn:#e0a24a; --bad:#ec7c70; --track:#2a332f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;
+  padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance}
+h1{font-size:26px;letter-spacing:-.01em}
+h2{font-size:18px} h3{font-size:15px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sub{color:var(--muted);margin:2px 0 0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;min-height:34px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.55;cursor:default}
+.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+.primary:hover{filter:brightness(1.08)}
+.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:4px 8px;min-height:28px}
+a.linkbtn{display:inline-flex;align-items:center;text-decoration:none;border-radius:6px;font-size:13px}
+a.linkbtn:hover{color:var(--fg)}
+.danger{color:var(--bad)}
+input,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+textarea{min-height:110px;resize:vertical}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.add{padding:16px;display:grid;grid-template-columns:1fr;gap:12px}
+.add[hidden]{display:none}
+.add .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+td button{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.sel td{background:var(--accent-soft)}
+.cname{font-weight:600;font-family:var(--font-display);font-size:15px;cursor:pointer;background:none;border:0;padding:0;min-height:0;text-align:left;white-space:normal}
+.cname:hover{color:var(--accent)}
+.scope{color:var(--muted);font-size:12.5px;max-width:240px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bar{height:8px;background:var(--track);border-radius:99px;overflow:hidden;min-width:90px}
+.bar>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.num{font-variant-numeric:tabular-nums;font-weight:600}
+.pcell{display:flex;flex-direction:column;gap:5px;min-width:110px}
+.progset{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--bg)}
+.progset label{margin:0;font-size:11px}
+.progset input[type=range]{width:150px;padding:0;border:0;background:transparent;accent-color:var(--accent)}
+.progset .progval{min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.pill.good{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.pill.none{background:var(--track);color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.empty{padding:36px 16px;text-align:center;color:var(--muted)}
+.desk{padding:20px;display:flex;flex-direction:column;gap:18px}
+.deskhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.sec{display:flex;flex-direction:column;gap:10px;min-width:0}
+.lesson{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--bg);overflow-wrap:anywhere}
+.lesson h4{margin:14px 0 4px;font-family:var(--font-display);font-size:15px}
+.lesson h4:first-child{margin-top:0}
+.lesson p{margin:6px 0}.lesson ul{margin:6px 0;padding-left:20px}
+.lesson code{background:var(--track);padding:1px 5px;border-radius:4px;font-size:12.5px}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--accent)}
+.q{border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.opt{text-align:left;width:100%;display:flex;gap:10px;background:var(--surface)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.opt b{min-width:16px}
+.expl{font-size:13px;color:var(--muted)}
+.err{color:var(--bad);font-size:13px}
+.history{display:flex;flex-direction:column;gap:6px}
+details.hl{border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+details.hl summary{cursor:pointer;font-weight:600}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.sessions .bar{max-width:360px}
+.sesslist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px 18px;margin-top:10px}
+.sess{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:400;color:var(--fg);text-transform:none;letter-spacing:0;margin:0;padding:3px 0;cursor:pointer;line-height:1.35}
+.sess input{width:auto;margin:2px 0 0;padding:0;border:0;background:none;accent-color:var(--accent);flex:none}
+.sess span{overflow-wrap:anywhere}
+.sess input:checked+span{color:var(--muted);text-decoration:line-through}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}.bar>i{transition:none}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Course Tracker</h1>
+      <p class="sub" id="summary">Loading your courses…</p>
+    </div>
+    <div class="actions" style="flex-wrap:nowrap">
+      <button id="backupBtn" class="ghost" title="Write the saved course data to backup/ on this computer">Save backup</button>
+      <a class="ghost linkbtn" href="/code" title="Every file in this project, served from this computer">Code</a>
+      <button id="toggleAdd" class="primary">+ Add course</button>
+    </div>
+  </header>
+
+  <form id="addForm" class="panel add" hidden>
+    <div><label for="newName">Course name</label><input id="newName" placeholder="e.g. System Design Fundamentals" required></div>
+    <div><label for="newScope">Full course scope (everything that counts as 100%)</label>
+      <textarea id="newScope" placeholder="Paste the syllabus, chapter list or topics. It is treated as the complete course and trained from where you are to 100%."></textarea></div>
+    <div class="row"><button type="button" id="cancelAdd">Cancel</button><button class="primary" type="submit" id="saveAdd">Save course</button></div>
+  </form>
+
+  <div class="panel tablebox" id="tableWrap"></div>
+  <div id="deskHost"></div>
+</div>
+
+<script>
+/* ---------- local runtime: replaces the two claude.ai host APIs ----------
+   db     -> localStorage document store with onSnapshot
+   sample -> offline lesson / quiz generator built from the pasted syllabus
+   Inside the claude.ai artifact viewer window.claude already exists, so this
+   block steps aside and the original behaviour is kept. */
+(function () {
+  if (window.claude && typeof window.claude.use === 'function') return;
+
+  /* ================= db ================= */
+  const DB_KEY = 'ct-db-v1';
+  const listenerSets = new Map();
+
+  function readDb() {
+    try {
+      const raw = localStorage.getItem(DB_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === 'object' && parsed.courses) return parsed;
+    } catch (e) {}
+    return { courses: {} };
+  }
+  function writeDb(data) {
+    try { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
+    catch (e) { console.warn('Course Tracker: could not persist data', e); }
+  }
+  function docsOf(name) {
+    const col = readDb()[name] || {};
+    return Object.keys(col).map(id => ({ id, data: () => col[id] }));
+  }
+  function emit(name) {
+    const set = listenerSets.get(name);
+    if (!set) return;
+    for (const fn of [...set]) {
+      Promise.resolve().then(() => {
+        try { fn({ docs: docsOf(name) }); } catch (e) { console.error(e); }
+      });
+    }
+  }
+  function subscribe(name, cb) {
+    if (!listenerSets.has(name)) listenerSets.set(name, new Set());
+    listenerSets.get(name).add(cb);
+    const docs = docsOf(name);
+    Promise.resolve().then(() => cb({ docs }));
+    return () => listenerSets.get(name).delete(cb);
+  }
+  window.addEventListener('storage', e => {
+    if (e.key && e.key !== DB_KEY) return;
+    for (const name of [...listenerSets.keys()]) emit(name);
+  });
+
+  function makeQuery(name, order) {
+    return {
+      orderBy(field, dir) { return makeQuery(name, { field, dir: dir === 'desc' ? -1 : 1 }); },
+      onSnapshot(cb, errCb) {
+        return subscribe(name, snap => {
+          let docs = snap.docs;
+          if (order) {
+            docs = [...docs].sort((a, b) => {
+              const av = a.data()[order.field], bv = b.data()[order.field];
+              if (av === bv) return 0;
+              return (av > bv ? 1 : -1) * order.dir;
+            });
+          }
+          cb({ docs });
+        });
+      },
+      async add(fields) {
+        const data = readDb();
+        if (!data[name]) data[name] = {};
+        const id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        data[name][id] = Object.assign({}, fields);
+        writeDb(data);
+        emit(name);
+        return { id };
+      },
+      doc(id) {
+        return {
+          async update(patch) {
+            const data = readDb();
+            if (!data[name] || !data[name][id]) throw new Error('Missing document: ' + id);
+            const next = Object.assign({}, data[name][id]);
+            for (const k of Object.keys(patch)) {
+              if (patch[k] === undefined) delete next[k];
+              else next[k] = patch[k];
+            }
+            data[name][id] = next;
+            writeDb(data);
+            emit(name);
+          },
+          async delete() {
+            const data = readDb();
+            if (data[name]) delete data[name][id];
+            writeDb(data);
+            emit(name);
+          },
+          async get() {
+            const col = readDb()[name] || {};
+            return { exists: !!col[id], id, data: () => col[id] };
+          }
+        };
+      }
+    };
+  }
+
+  const db = { collection: name => makeQuery(name, { field: 'createdAt', dir: 1 }) };
+
+  /* ================= sample: offline tutor ================= */
+  const COURSE_RE = /^Course:\s*(.+)$/m;
+  const SCOPE_RE = /^Scope:\n([\s\S]*?)\n\nSplit the scope/m;
+  const BLOCK_RE = /I have covered ([\d.]+)% so far\. Teach me the part of the course from ([\d.]+)% to ([\d.]+)%\./;
+
+  function splitScope(scope) {
+    const clean = s => s.replace(/^#{1,6}\s*/, '')
+      .replace(/^[-*\u2022]\s+/, '')
+      .replace(/^\d+[.)]\s*/, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/[.;,]$/, '');
+
+    const lines = String(scope || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(clean).filter(Boolean);
+    let items = lines;
+    if (items.length < 4) {
+      const extra = [];
+      for (const l of lines) {
+        const commas = (l.match(/,/g) || []).length;
+        if (commas >= 2 || l.length > 220) {
+          for (const part of l.split(/[,;\u2022]|\s\|\s/)) {
+            const t = clean(part);
+            if (t) extra.push(t);
+          }
+        } else extra.push(l);
+      }
+      items = extra;
+    }
+    const seen = new Set();
+    return items.filter(t => {
+      const k = t.toLowerCase();
+      if (!k || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
+  function buildLesson(prompt) {
+    const cm = prompt.match(COURSE_RE);
+    const course = cm ? cm[1].trim() : 'This course';
+    const sm = prompt.match(SCOPE_RE);
+    const scope = sm ? sm[1] : '';
+    const bm = prompt.match(BLOCK_RE);
+    const from = bm ? Number(bm[1]) : 0;
+    const to = bm ? Number(bm[3]) : Math.min(100, from + 40);
+    const items = splitScope(scope || prompt);
+
+    if (!items.length) {
+      return ['## ' + course, '- No syllabus text was found for this course.',
+        '- Open "Edit scope" (or delete and re-add the course) and paste the chapter or topic list.',
+        '- Then press "Train" again to build this block.'].join('\n');
+    }
+
+    const n = items.length;
+    const picked = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * 100, b = ((i + 1) / n) * 100;
+      if (b > from && a < to) picked.push(i);
+    }
+    if (!picked.length) picked.push(Math.min(n - 1, Math.floor((from / 100) * n)));
+
+    const out = [];
+    const lm = prompt.match(/^Label:\s*(.+)$/m);
+    const heading = lm ? lm[1].trim() : 'Block ' + from + '% to ' + to + '%';
+    out.push('## ' + heading + ': ' + picked.length + ' topic' + (picked.length > 1 ? 's' : ''));
+
+    // checklist: the whole block, wrapped so no bullet becomes a wall of text
+    for (let i = 0; i < picked.length; i += 5) {
+      out.push('- ' + picked.slice(i, i + 5).map(k => items[k]).join(' · '));
+    }
+    out.push('');
+
+    // detailed walkthrough for a readable number of topics, spread across the block
+    const CAP = 10;
+    let detailed = picked.filter(i => !/^module\s+\d+/i.test(items[i]));
+    if (!detailed.length) detailed = picked;
+    if (detailed.length > CAP) {
+      const spread = [];
+      for (let j = 0; j < CAP; j++) spread.push(detailed[Math.round((j * (detailed.length - 1)) / (CAP - 1))]);
+      detailed = [...new Set(spread)];
+      out.push('_' + detailed.length + ' of the ' + picked.length + ' topics in this block get a walked-through section below; the checklist above covers the rest._');
+      out.push('');
+    }
+
+    detailed.forEach(i => {
+      const topic = items[i];
+      const prev = i > 0 ? items[i - 1] : null;
+      const next = i + 1 < n ? items[i + 1] : null;
+      out.push('## ' + topic);
+      out.push('**Where it sits:** topic ' + (i + 1) + ' of ' + n + ' in ' + course +
+        ', roughly ' + Math.round((i / n) * 100) + '% to ' + Math.round(((i + 1) / n) * 100) + '% of the syllabus' +
+        (prev ? ', right after ' + prev : ' (opening topic)') +
+        (next ? ' and before ' + next : ' (final topic)') + '.');
+      out.push('');
+      out.push('**Explanation:** Write a one-line definition of ' + topic + ' in your own words, then list the three or four ideas it depends on. Say out loud how it connects to ' +
+        (prev || 'the course goal') + ' and to ' + (next || 'the final outcome') + '. If you cannot, the gap is in the earlier topic, not this one.');
+      out.push('');
+      out.push('**Example:** Build a small worked case for ' + topic +
+        ': take one problem or scenario from your notes, work it end to end in five to ten lines, then add one sentence on what the technique bought you.');
+      out.push('');
+      out.push('**Common mistake:** memorising the name "' + topic + '" and moving on. The real test is applying it to a case where the obvious approach fails.');
+      out.push('');
+    });
+
+    out.push('## Key takeaways');
+    detailed.forEach(i => out.push('- **' + items[i] + '**: you should be able to define it, give one example, and place it between the surrounding topics.'));
+    out.push('- This block moves you from ' + from + '% to ' + to + '% of ' + course + '. Mark it complete only when every checklist item above is explainable without notes.');
+    out.push('- _Lesson generated locally from your syllabus text (offline mode), not by an AI model._');
+    return out.join('\n');
+  }
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function sampleFrom(arr, k, exclude) {
+    const pool = arr.filter(x => !(exclude || []).includes(x));
+    const out = [];
+    while (out.length < k && pool.length) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    return out;
+  }
+  function mkQuestion(question, correct, distractors, explanation) {
+    const opts = [correct, ...distractors.filter(d => d && d !== correct)];
+    if (new Set(opts).size !== 4) return null;
+    shuffle(opts);
+    return { question, options: opts, answer: opts.indexOf(correct), explanation };
+  }
+
+  function buildQuiz(prompt) {
+    const head = prompt.match(/^Create a random (\d+)-question multiple-choice quiz for the course "(.*?)"\./m);
+    const want = head ? Math.max(1, Math.min(10, Number(head[1]))) : 5;
+    const course = head ? head[2] : 'this course';
+    const sc = prompt.match(/Full course scope \(100%\):\n([\s\S]*?)\n\nThe learner has covered only the first ([\d.]+)%/);
+    const scope = sc ? sc[1] : '';
+    const covered = sc ? Number(sc[2]) : 100;
+    const pv = prompt.match(/Avoid repeating these earlier questions:\n([\s\S]*?)\n\nReturn JSON only/);
+    const previous = pv ? pv[1].split('\n').map(s => s.trim()).filter(s => s && s !== '(none)') : [];
+
+    let items = splitScope(scope);
+    if (items.length < 4) {
+      const tail = prompt.split('Full course scope (100%):')[1] || prompt;
+      items = splitScope(tail.replace(/The learner has covered[\s\S]*/, ''));
+    }
+    if (!items.length) items = [course];
+
+    const n = items.length;
+    const splitAt = Math.max(1, Math.min(n, Math.ceil((covered / 100) * n)));
+    const isHeading = t => /^module\s+\d+/i.test(t);
+    const topicItems = items.filter(t => !isHeading(t));
+    const base = topicItems.length >= 6 ? topicItems : items;
+    const done = base.slice(0, Math.max(1, Math.ceil((splitAt / n) * base.length)));
+    const later = base.slice(done.length);
+    const pool = [];
+    const usedAnchors = Object.create(null);
+    const adjacent = [];
+    for (let i = 0; i + 1 < items.length; i++) {
+      if (isHeading(items[i]) || isHeading(items[i + 1]) || i + 1 >= splitAt) continue;
+      adjacent.push(i);
+    }
+
+    const pickOne = arr => arr[Math.floor(Math.random() * arr.length)];
+    const say = list => list[Math.floor(Math.random() * list.length)];
+
+    const recognise = () => {
+      if (!later.length || !done.length) return null;
+      const correct = pickOne(done);
+      const distractors = sampleFrom(later, 3);
+      if (distractors.length < 3) return null;
+      return mkQuestion(say([
+          'Which of these topics is part of the first ' + covered + '% of "' + course + '"?',
+          'Which of these belongs to the part of "' + course + '" you have covered so far?',
+          'Which topic have you already reached in "' + course + '"?'
+        ]),
+        correct, distractors,
+        correct + ' is topic ' + (items.indexOf(correct) + 1) + ' of ' + n + ', inside the ' + covered + '% you have covered. The other options come later in the course.');
+    };
+    const negative = () => {
+      if (!later.length || done.length < 3) return null;
+      const correct = pickOne(later);
+      return mkQuestion(say([
+          'Which topic is NOT part of the first ' + covered + '% of "' + course + '"?',
+          'Which of these topics have you not reached yet in "' + course + '"?',
+          'Which topic still lies ahead of you in "' + course + '"?'
+        ]),
+        correct, sampleFrom(done, 3),
+        correct + ' is topic ' + (items.indexOf(correct) + 1) + ' of ' + n + ', so it sits beyond the ' + covered + '% you have covered.');
+    };
+    const ordering = () => {
+      if (n < 5 || !adjacent.length) return null;
+      const i = pickOne(adjacent);
+      const anchor = items[i], correct = items[i + 1];
+      if (anchor in usedAnchors) return null;
+      const distractors = sampleFrom(base, 3, [anchor, correct]);
+      if (distractors.length < 3) return null;
+      usedAnchors[anchor] = true;
+      return mkQuestion(say([
+          'In the syllabus order for "' + course + '", which topic comes immediately after "' + anchor + '"?',
+          'You have just finished "' + anchor + '" in "' + course + '". What is the next topic in the scope?',
+          'Which topic follows "' + anchor + '" in the scope of "' + course + '"?'
+        ]),
+        correct, distractors,
+        'The scope lists ' + correct + ' directly after ' + anchor + ', at position ' + (i + 2) + ' of ' + n + '.');
+    };
+    const opener = () => {
+      if (base.length < 4 || !done.length) return null;
+      return mkQuestion(say([
+          'Which topic opens the syllabus of "' + course + '"?',
+          'Which topic comes first in the scope of "' + course + '"?',
+          'Where does the scope of "' + course + '" start?'
+        ]),
+        base[0], sampleFrom(base.slice(1), 3),
+        base[0] + ' is the first topic listed in the scope for this course.');
+    };
+    const closer = () => {
+      if (base.length < 4 || later.length) return null;
+      return mkQuestion(say([
+          'Which topic closes the syllabus of "' + course + '"?',
+          'Which topic is the last one listed in the scope of "' + course + '"?'
+        ]),
+        base[base.length - 1], sampleFrom(base.slice(0, -1), 3),
+        base[base.length - 1] + ' is the final topic listed in the scope for this course.');
+    };
+
+    const builders = [recognise, ordering, negative, ordering, opener, closer];
+    const seenQ = new Set(previous);
+    const takePass = allowRepeat => {
+      for (const b of shuffle([...builders])) {
+        if (pool.length >= want) return;
+        const q = b();
+        if (!q) continue;
+        if (!allowRepeat && seenQ.has(q.question)) continue;
+        seenQ.add(q.question);
+        pool.push(q);
+      }
+    };
+    for (let pass = 0; pass < 8 && pool.length < want; pass++) takePass(false);
+    for (let pass = 0; pass < 8 && pool.length < want; pass++) takePass(true);
+
+    if (!pool.length) {
+      pool.push({
+        question: 'Which statement matches the scope you pasted for "' + course + '"?',
+        options: ['"' + items[0] + '" is listed in the scope', 'The scope is empty', 'The scope has no topics', 'The course has no syllabus'],
+        answer: 0,
+        explanation: 'The scope you pasted starts with "' + items[0] + '".'
+      });
+    }
+    return pool;
+  }
+
+  const sample = async function () {
+    return { text: buildLesson(arguments[0]) };
+  };
+  sample.json = async function () {
+    return buildQuiz(arguments[0]);
+  };
+
+  window.claude = {
+    async use(name) {
+      if (name === 'db') return db;
+      if (name === 'sample') return sample;
+      return null;
+    }
+  };
+})();
+</script>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let db = null, sample = null, courses = [], selected = null, loaded = false;
+const ui = {}; // per-course transient state: {busy, err, quiz:{qs,i,picked,done}, confirmDelete}
+const st = id => (ui[id] ||= {});
+
+try { selected = localStorage.getItem('ct-sel'); } catch(e){}
+
+function confClass(c){ return c==null?'none':c>=75?'good':c>=45?'warn':'bad'; }
+function displayScope(s){
+  return String(s || 'No scope added')
+    .replace(/^#{1,6}\s*/gm, '')
+    .replace(/^[-*\u2022]\s+/gm, '')
+    .replace(/\s*\n+\s*/g, ' \u00b7 ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim() || 'No scope added';
+}
+function lessonHtml(t){
+  const lines = String(t||'').split('\n'); let out='', inList=false;
+  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
+  for (const raw of lines){
+    const l = raw.trim();
+    if (/^[-*] /.test(l)){ if(!inList){out+='<ul>';inList=true} out+='<li>'+inline(l.slice(2))+'</li>'; continue; }
+    if (inList){out+='</ul>';inList=false}
+    if (/^#{1,4} /.test(l)) out+='<h4>'+inline(l.replace(/^#+ /,''))+'</h4>';
+    else if (l) out+='<p>'+inline(l)+'</p>';
+  }
+  return out + (inList?'</ul>':'');
+}
+
+/* ---------- render ---------- */
+function render(){
+  const n = courses.length;
+  const avg = n ? Math.round(courses.reduce((a,c)=>a+(c.progress||0),0)/n) : 0;
+  $('summary').textContent = !loaded ? 'Loading your courses…' :
+    n ? `${n} course${n>1?'s':''} · ${avg}% average completion` : 'No courses yet. Add your first one.';
+  renderTable(); renderDesk();
+}
+function renderTable(){
+  if (!loaded){ $('tableWrap').innerHTML='<div class="empty">Loading…</div>'; return; }
+  if (!courses.length){ $('tableWrap').innerHTML='<div class="empty">Nothing here yet. Use “Add course” and paste the full syllabus so I know what 100% means.</div>'; return; }
+  let h = `<table><thead><tr><th>Course</th><th>Scope (100%)</th><th>Completed</th><th>Training</th><th>Quiz</th><th>Confidence</th></tr></thead><tbody>`;
+  for (const c of courses){
+    const s = st(c.id), p = c.progress||0, done = p>=100;
+    const pend = c.pending ? ' (lesson waiting)' : '';
+    h += `<tr class="${c.id===selected?'sel':''}">
+      <td><button class="cname" data-open="${c.id}">${esc(c.name)}</button><div class="small">${(c.quizTotal||0)} quiz answers</div></td>
+      <td><div class="scope">${esc(displayScope(c.scope))}</div></td>
+      <td><div class="pcell"><span class="num">${p}%</span><div class="bar"><i style="width:${p}%"></i></div></div></td>
+      <td><button class="primary" data-train="${c.id}" ${s.busy||done||blockRange(c).marked===0?'disabled':''}>${s.busy==='train'?'<span class="spin"></span>Preparing…':done?'Course done':c.pending?'Open lesson':blockRange(c).marked===0?'Tick items first':blockLabel(c)}</button></td>
+      <td><button data-quiz="${c.id}" ${s.busy||p<=0?'disabled':''} title="${p<=0?'Complete some training first':''}">${s.busy==='quiz'?'<span class="spin"></span>Building…':'Quiz me'}</button></td>
+      <td><span class="pill ${confClass(c.confidence)}">${c.confidence==null?'Not tested':Math.round(c.confidence)+'%'}</span></td>
+    </tr>`;
+  }
+  $('tableWrap').innerHTML = h+'</tbody></table>';
+}
+function sessionsView(c){
+  const list = c.sessions || [];
+  if (!list.length) return '';
+  const done = list.filter(s => s.done).length;
+  const pct = Math.round((done / list.length) * 100);
+  const mods = [];
+  for (const s of list) {
+    let m = mods.find(x => x.name === s.module);
+    if (!m) { m = { name: s.module, items: [] }; mods.push(m); }
+    m.items.push(s);
+  }
+  let h = `<div class="sec sessions"><h3>Portal progress</h3>
+    <div class="small">${done} of ${list.length} items done · ${pct}% · QA sessions excluded</div>
+    <div class="bar"><i style="width:${pct}%"></i></div>`;
+  for (const m of mods) {
+    const md = m.items.filter(s => s.done).length;
+    const ui = st(c.id);
+    const openMods = ui.openMods || {};
+    const open = m.name in openMods ? openMods[m.name] : (md > 0 && md < m.items.length);
+    h += `<details class="hl" data-mod="${esc(m.name)}"${open ? ' open' : ''}>
+      <summary>${esc(m.name)} &#183; ${md}/${m.items.length}</summary>
+      <div class="sesslist">`;
+    for (const s of m.items) {
+      h += `<label class="sess"><input type="checkbox" data-sess="${esc(s.id)}"${s.done ? ' checked' : ''}><span>${esc(s.label)}</span></label>`;
+    }
+    const confirming = md === m.items.length && ui.clear === m.name;
+    h += `</div><div class="actions">` + (md === m.items.length
+      ? (confirming
+          ? `<button class="danger" data-sessclear="${esc(m.name)}">Yes, clear ${md} tick${md === 1 ? '' : 's'}</button><button class="ghost" data-sessclearno="1">Keep</button>`
+          : `<button class="ghost" data-sessask="${esc(m.name)}">Clear module</button>`)
+      : `<button class="ghost" data-sessall="${esc(m.name)}">Mark module done</button>`) +
+      `</div></details>`;
+  }
+  return h + '</div>';
+}
+function renderDesk(){
+  const c = courses.find(x=>x.id===selected);
+  const host = $('deskHost');
+  if (!c){ host.innerHTML=''; return; }
+  const s = st(c.id), p = c.progress||0;
+  const list = c.sessions || [];
+  let h = `<section class="panel desk"><div class="deskhead"><div><h2>${esc(c.name)}</h2>
+    <div class="small">${p}% covered · confidence ${c.confidence==null?'not tested yet':Math.round(c.confidence)+'%'} · ${c.quizCorrect||0}/${c.quizTotal||0} correct overall</div></div>
+    <div class="actions">${list.length ? '' : `<div class="progset"><label for="progRange">Progress</label><input id="progRange" type="range" min="0" max="100" step="1" value="${p}" aria-label="Course completion percent"><span class="num progval">${p}%</span></div>`}
+    <button class="ghost" data-edit="${c.id}">Edit scope</button>
+    ${s.confirmDelete?`<button class="danger" data-del-yes="${c.id}">Yes, delete course</button><button class="ghost" data-del-no="1">Keep</button>`:`<button class="ghost danger" data-del="${c.id}">Delete</button>`}
+    <button class="ghost" data-close="1">Close</button></div></div>`;
+  if (s.err) h += `<div class="err">${esc(s.err)}</div>`;
+  if (s.editing) h += `<div class="sec"><label for="editScope">Course scope</label><textarea id="editScope">${esc(c.scope||'')}</textarea><div class="actions"><button class="primary" data-saveedit="${c.id}">Save scope</button><button data-canceledit="1">Cancel</button></div></div>`;
+  h += sessionsView(c);
+  h += `<div class="cols"><div class="sec"><h3>Lessons</h3>`;
+  if (c.pending){
+    h += `<div class="tag">Current lesson · ${esc(c.pending.label || (c.pending.from + '% to ' + c.pending.to + '%'))}</div><div class="lesson">${lessonHtml(c.pending.text)}</div>
+      <div class="actions"><button class="primary" data-finish="${c.id}">${c.sessions&&c.sessions.length?'I\'ve studied this, mark block done':'I\'ve studied this, mark '+c.pending.to+'% complete'}</button></div>`;
+  } else if (p>=100) h += `<div class="small">You've covered the whole course. Use the quiz to keep your confidence up.</div>`;
+  else {
+    const br = blockRange(c);
+    const none = br.marked === 0;
+    h += `<div class="small">${br.marked != null
+      ? (none
+          ? 'Nothing is ticked yet. Tick a session above and Train will revise only the ticked items.'
+          : 'Training revises only the ' + br.marked + ' item' + (br.marked === 1 ? '' : 's') + ' you have ticked (' + p + '% of the course). Clear a module and it drops out of the next block.')
+      : 'Your next block covers the rest of the course: ' + br.from + '% to 100%, with no step limit.'}</div>
+      <div class="actions"><button class="primary" data-train="${c.id}" ${s.busy||none?'disabled':''}>${s.busy==='train'?'<span class="spin"></span>Preparing…':blockLabel(c)}</button></div>`;
+  }
+  const past = c.lessons||[];
+  if (past.length){ h += `<div class="history">`; for (const l of [...past].reverse()) h += `<details class="hl"><summary>${esc(l.label || (l.from + '% to ' + l.to + '%'))}</summary><div class="lesson" style="margin-top:8px">${lessonHtml(l.text)}</div></details>`; h += `</div>`; }
+  h += `</div><div class="sec"><h3>Quiz</h3>${quizHtml(c,s)}</div></div></section>`;
+  host.innerHTML = h;
+}
+function quizHtml(c,s){
+  const q = s.quiz;
+  if (!q) return `<div class="small">${isItemCourse(c)
+    ? 'A short random quiz on the ' + markedItems(c).length + ' item' + (markedItems(c).length === 1 ? '' : 's') + ' you have ticked.'
+    : 'A short random quiz drawn from the ' + (c.progress || 0) + '% you have covered.'} Each answer moves your confidence score.</div><div class="actions"><button class="primary" data-quiz="${c.id}" ${s.busy||!(c.progress>0)?'disabled':''}>Start quiz</button></div>`;
+  if (q.i>=q.qs.length) return `<div class="lesson"><b>Quiz finished:</b> ${q.score}/${q.qs.length} correct.<br>Confidence is now ${Math.round(c.confidence??0)}%.</div><div class="actions"><button class="primary" data-quiz="${c.id}">Another quiz</button></div>`;
+  const cur = q.qs[q.i];
+  let h = `<div class="q"><div class="small">Question ${q.i+1} of ${q.qs.length}</div><div><b>${esc(cur.question)}</b></div>`;
+  cur.options.forEach((o,k)=>{
+    let cls=''; if (q.picked!=null){ if(k===cur.answer) cls='right'; else if(k===q.picked) cls='wrong'; }
+    h += `<button class="opt ${cls}" data-pick="${k}" ${q.picked!=null?'disabled':''}><b>${'ABCD'[k]}</b><span>${esc(o)}</span></button>`;
+  });
+  if (q.picked!=null) h += `<div class="expl">${q.picked===cur.answer?'Correct. ':'Not quite. '}${esc(cur.explanation)}</div><div class="actions"><button class="primary" data-next="1">${q.i+1<q.qs.length?'Next question':'See result'}</button></div>`;
+  return h+'</div>';
+}
+
+/* ---------- actions ---------- */
+function ref(id){ return db.collection('courses').doc(id); }
+async function save(id, patch){ try{ await ref(id).update(patch); }catch(e){ st(id).err='Could not save: '+(e.message||e.code); render(); } }
+function openCourse(id){ selected=id; try{localStorage.setItem('ct-sel',id)}catch(e){} render(); $('deskHost').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+
+function isItemCourse(c){ return !!(c.sessions && c.sessions.length); }
+function markedItems(c){ return (c.sessions || []).filter(s => s.done); }
+function blockRange(c){
+  // Item-driven courses train in revision mode: only the ticked items, in order.
+  if (isItemCourse(c)) return { from: 0, to: 100, marked: markedItems(c).length };
+  const from = Math.max(0, Math.min(100, Math.round(c.progress || 0)));
+  return { from, to: 100 };
+}
+function blockLabel(c){
+  const b = blockRange(c);
+  return b.marked != null ? 'Train marked (' + b.marked + ')' : 'Train ' + b.from + '% \u2192 ' + b.to + '%';
+}
+function scopeFor(c){
+  if (isItemCourse(c)) return markedItems(c).map(s => '- ' + s.module + ': ' + s.label).join('\n');
+  return c.scope || '';
+}
+async function train(id){
+  const c = courses.find(x=>x.id===id); if(!c) return;
+  if (c.pending){ openCourse(id); return; }
+  const s = st(id); s.busy='train'; s.err=null; openCourse(id);
+  const b = blockRange(c);
+  const { from, to } = b;
+  if (b.marked === 0){ s.busy=null; s.err='Tick at least one item in Portal progress, then train.'; render(); return; }
+  const scope = scopeFor(c);
+  const label = b.marked != null ? 'Revision of your ' + b.marked + ' marked item' + (b.marked === 1 ? '' : 's') : '';
+  const earlier = (c.lessons||[]).length
+    ? 'Earlier lessons covered: ' + c.lessons.map(l => l.label || (l.from + '-' + l.to + '%')).join(', ') + '. Do not repeat them.'
+    : '';
+  const prompt = `You are my personal tutor. Below is the full scope of a course; treat it as 100% of the material.
+Course: ${c.name}
+Scope:
+${scope||'(none given, infer a standard syllabus for this course name)'}
+
+Split the scope into an ordered sequence by percentage. I have covered ${from}% so far. Teach me the part of the course from ${from}% to ${to}%.
+Write a clear study lesson: start with a one-line list of what this block covers, then teach each topic with explanation, a concrete example, and a common mistake. End with a "Key takeaways" bullet list.
+Format: plain text using "## Heading", "- bullet" and **bold** only. No tables, no code fences.
+${earlier}${label ? '\nLabel: ' + label : ''}`;
+  render();
+  try{
+    const r = await sample(prompt,{modelTier:'default',cache:false});
+    await save(id,{pending:{from,to,label,text:r.text}});
+  }catch(e){ s.err = e.code==='not_granted'?'Permission to ask Claude was declined.':'Could not generate the lesson: '+(e.message||e.code); }
+  s.busy=null; render();
+}
+async function finish(id){
+  const c = courses.find(x=>x.id===id); if(!c||!c.pending) return;
+  const lessons=[...(c.lessons||[]), c.pending];
+  const patch = { lessons, pending: null };
+  // A course driven by ticked portal items keeps its percentage from those items only.
+  if (!(c.sessions && c.sessions.length)) patch.progress = c.pending.to;
+  await save(id, patch);
+}
+async function startQuiz(id){
+  const c = courses.find(x=>x.id===id); if(!c) return;
+  const s = st(id); s.busy='quiz'; s.err=null; openCourse(id); render();
+  const covered = c.progress||0;
+  const prev = (c.askedQs||[]).slice(-25);
+  const prompt = `Create a random 5-question multiple-choice quiz for the course "${c.name}".
+Full course scope (100%):
+${scopeFor(c)||'(infer from course name)'}
+
+${isItemCourse(c)
+  ? 'The scope above lists only the ' + markedItems(c).length + ' items the learner has marked as watched, so ask ONLY about those items.'
+  : 'The learner has covered only the first ' + covered + '% of this scope, so ask ONLY about material within that portion.'}${(c.lessons||[]).length?'\nLessons taught so far:\n'+c.lessons.map(l=>l.text.slice(0,1500)).join('\n---\n'):''}
+Mix easy, medium and hard. Randomize which option is correct. Avoid repeating these earlier questions:
+${prev.join('\n')||'(none)'}
+
+Return JSON only: an array of 5 objects {"question":string,"options":[4 strings],"answer":index 0-3,"explanation":string (one or two sentences)}.`;
+  try{
+    const qs = await sample.json(prompt,{modelTier:'default',cache:false});
+    if(!Array.isArray(qs)||!qs.length) throw new Error('No questions returned');
+    s.quiz={qs:qs.filter(q=>q&&q.options&&q.options.length===4),i:0,picked:null,score:0};
+  }catch(e){ s.err='Could not build the quiz: '+(e.message||e.code); }
+  s.busy=null; render();
+}
+async function pick(k){
+  const c = courses.find(x=>x.id===selected); const q = st(selected).quiz; if(!c||!q||q.picked!=null) return;
+  const cur = q.qs[q.i]; q.picked=k; const ok = k===cur.answer; if(ok) q.score++;
+  const prevConf = c.confidence;
+  const conf = prevConf==null ? (ok?70:30) : prevConf + ((ok?100:0)-prevConf)*0.2;
+  render();
+  await save(c.id,{confidence:Math.round(conf*10)/10, quizTotal:(c.quizTotal||0)+1, quizCorrect:(c.quizCorrect||0)+(ok?1:0),
+    askedQs:[...(c.askedQs||[]),cur.question].slice(-40)});
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async e=>{
+  const b = e.target.closest('button'); if(!b) return; const d=b.dataset;
+  if (d.open) openCourse(d.open);
+  else if (d.train) train(d.train);
+  else if (d.quiz){ startQuiz(d.quiz); }
+  else if (d.finish) finish(d.finish);
+  else if (d.pick!==undefined) pick(+d.pick);
+  else if (d.next){ const q=st(selected).quiz; q.i++; q.picked=null; render(); }
+  else if (d.close){ selected=null; render(); }
+  else if (d.del){ st(d.del).confirmDelete=true; render(); }
+  else if (d.delNo){ st(selected).confirmDelete=false; render(); }
+  else if (d.delYes){ try{ await ref(d.delYes).delete(); selected=null; }catch(err){ st(d.delYes).err='Could not delete.'; render(); } }
+  else if (d.edit){ st(d.edit).editing=true; render(); }
+  else if (d.canceledit){ st(selected).editing=false; render(); }
+  else if (d.saveedit){ const v=$('editScope').value; st(selected).editing=false; await save(d.saveedit,{scope:v}); }
+  else if (d.sessask){ st(selected).clear = d.sessask; render(); }
+  else if (d.sessclearno){ st(selected).clear = null; render(); }
+  else if (d.sessclear !== undefined){
+    const c = courses.find(x=>x.id===selected);
+    if (!c || !c.sessions) return;
+    st(c.id).clear = null;
+    st(c.id).openMods = { ...(st(c.id).openMods || {}), [d.sessclear]: false };   // module folds once it is cleared
+    const sessions = c.sessions.map(s => s.module === d.sessclear ? { ...s, done: false } : s);
+    const done = sessions.filter(s => s.done).length;
+    const patch = { sessions, progress: Math.round((done / sessions.length) * 100) };
+    if (c.pending) patch.pending = null;   // a cleared module invalidates the lesson in flight
+    await save(c.id, patch);
+  }
+  else if (d.sessall!==undefined){
+    const c = courses.find(x=>x.id===selected);
+    if (!c || !c.sessions) return;
+    const items = c.sessions.filter(s=>s.module===d.sessall);
+    const allDone = items.every(s=>s.done);
+    const sessions = c.sessions.map(s => s.module===d.sessall ? {...s, done:!allDone} : s);
+    const done = sessions.filter(s=>s.done).length;
+    await save(c.id,{sessions, progress:Math.round((done/sessions.length)*100)});
+  }
+});
+document.addEventListener('toggle', e => {
+  const d = e.target;
+  if (!d || d.tagName !== 'DETAILS' || !d.dataset.mod || !selected) return;
+  const ui = st(selected);
+  ui.openMods = { ...(ui.openMods || {}), [d.dataset.mod]: d.open };
+}, true);
+document.addEventListener('input', e => {
+  if (e.target.id !== 'progRange') return;
+  const out = e.target.closest('.progset') && e.target.closest('.progset').querySelector('.progval');
+  if (out) out.textContent = e.target.value + '%';
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.id === 'progRange') {
+    const c = courses.find(x => x.id === selected);
+    if (!c) return;
+    const v = Math.max(0, Math.min(100, Math.round(Number(t.value) || 0)));
+    const patch = { progress: v };
+    if (c.pending && v >= c.pending.to) patch.pending = null;
+    await save(c.id, patch);
+    return;
+  }
+  if (t.matches('input[data-sess]')) {
+    const c = courses.find(x => x.id === selected);
+    if (!c || !c.sessions) return;
+    const sessions = c.sessions.map(s => s.id === t.dataset.sess ? { ...s, done: t.checked } : s);
+    const done = sessions.filter(s => s.done).length;
+    const patch = { sessions, progress: Math.round((done / sessions.length) * 100) };
+    if (!t.checked && c.pending) patch.pending = null;   // unticking drops the revision block
+    await save(c.id, patch);
+  }
+});
+
+$('toggleAdd').onclick=()=>{ $('addForm').hidden=!$('addForm').hidden; if(!$('addForm').hidden)$('newName').focus(); };
+$('backupBtn').onclick = async () => {
+  const btn = $('backupBtn');
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/backup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: localStorage.getItem('ct-db-v1') || '{"courses":{}}'
+    });
+    const j = await res.json();
+    if (!res.ok || !j.ok) throw new Error(j.error || ('HTTP ' + res.status));
+    $('summary').textContent = 'Backup saved to ' + j.file;
+  } catch (e) {
+    $('summary').textContent = 'Backup failed: ' + (e.message || e) + ' (start the app with npm start so /api/backup exists)';
+  }
+  btn.disabled = false;
+};
+$('cancelAdd').onclick=()=>{ $('addForm').hidden=true; $('addForm').reset(); };
+$('addForm').addEventListener('submit', async e=>{
+  e.preventDefault(); if(!db) return;
+  const btn=$('saveAdd'); btn.disabled=true;
+  try{
+    const r = await db.collection('courses').add({name:$('newName').value.trim(), scope:$('newScope').value.trim(),
+      progress:0, confidence:null, quizTotal:0, quizCorrect:0, lessons:[], pending:null, askedQs:[], createdAt:Date.now()});
+    $('addForm').reset(); $('addForm').hidden=true; openCourse(r.id);
+  }catch(err){ $('summary').textContent='Could not save the course: '+(err.message||err.code); }
+  btn.disabled=false;
+});
+
+/* ---------- boot ---------- */
+render();
+(async()=>{
+  const timer = setTimeout(()=>{ if(!loaded){ loaded=true; $('summary').textContent='Could not load saved courses. Check that you are signed in.'; render(); }},10000);
+  [db, sample] = await Promise.all([claude.use('db'), claude.use('sample')]);
+  if(!db){ clearTimeout(timer); loaded=true; $('summary').textContent='Sign in to load and save your courses.'; render(); return; }
+  db.collection('courses').orderBy('createdAt','asc').onSnapshot(snap=>{
+    clearTimeout(timer); loaded=true;
+    courses = snap.docs.map(d=>({id:d.id,...d.data()}));
+    if (selected && !courses.some(c=>c.id===selected)) selected=null;
+    render();
+  }, err=>{ clearTimeout(timer); loaded=true; $('summary').textContent='Could not load courses: '+(err.message||err.code); render(); });
+  if(!sample) document.querySelectorAll('[data-train],[data-quiz]').forEach(b=>b.disabled=true);
+})();
+</script>

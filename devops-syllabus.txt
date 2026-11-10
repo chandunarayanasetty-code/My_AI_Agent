@@ -1,0 +1,192 @@
+DevOps with Multi Cloud (AWS + Azure)
+Frontlines Edutech — full syllabus
+
+## Module 1 — Introduction to DevOps
+- What is DevOps
+- Evolution from traditional software development to DevOps
+- Why organizations use DevOps
+- Goals and benefits of DevOps
+- DevOps life cycle
+- How cloud relates to DevOps
+
+## Module 2 — Introduction to Cloud
+- What is cloud computing
+- Evolution from traditional computing to cloud
+- Types of cloud (service and deployment models)
+- Cloud providers
+- Market value of cloud
+
+## Module 3 — OS: Linux
+- Hardware information commands
+- System information commands
+- File and directory commands
+- File viewing and editing
+- File permissions and ownership
+- User and group management
+- Process management
+- Service management (systemd)
+- Networking commands
+- Package management
+- Archive and compression
+- Disk and storage management
+- Log management
+- Text processing
+
+## Module 4 — SCM/VCS: Git, GitHub and Bitbucket
+- Introduction to version control (VCS)
+- Introduction to Git
+- Git architecture and concepts
+- Basic Git commands
+- Branching and merging
+- Working with remote repositories
+- Conflict resolution
+- Git tags and releases
+- Introduction to GitHub
+- Introduction to Bitbucket
+
+## Module 5 — Azure Services
+- Azure Active Directory
+- Virtual Machines
+- VM Scale Sets
+- Azure Load Balancers
+- Azure Container Registry
+- Azure Container Instances
+- Azure Kubernetes Service (AKS)
+- Azure Pipelines
+- Azure SQL Database
+- Azure Blob Storage
+- Azure Disks
+- Azure Artifacts
+- Azure Key Vault
+
+## Module 6 — Amazon Web Services (AWS)
+- Elastic Compute Cloud (EC2)
+- Virtual Private Cloud (VPC)
+- Simple Storage Service (S3)
+- Elastic Block Storage (EBS)
+- Identity and Access Management (IAM)
+- Relational Database Service (RDS)
+- Elastic Load Balancer (ELB)
+- Auto Scaling Group (ASG)
+- Elastic Container Registry (ECR)
+- Elastic Container Service (ECS)
+- Elastic Kubernetes Service (EKS)
+- Simple Notification Service (SNS)
+- CloudWatch
+- Route 53
+
+## Module 7 — CI/CD: Jenkins
+- Introduction to Jenkins
+- Continuous integration and continuous delivery
+- Jenkins architecture (controller, agent, executor)
+- Jenkins installation and setup
+- Jenkins user interface
+- Jenkins jobs (freestyle, pipeline, multi-branch)
+- Jenkins pipeline and pipeline as code
+- Jenkinsfile
+- Integrating Jenkins with Git
+- Build automation and triggers
+- Jenkins plugins
+- Jenkins security and credentials
+- Monitoring and troubleshooting builds
+
+## Module 8 — Containerization: Docker
+- Monolithic vs microservices
+- What is Docker and why it exists
+- Docker architecture
+- Installing and setting up Docker
+- Containers and container lifecycle
+- Images and custom images
+- Dockerfile and multi-stage builds
+- Volumes and storage
+- Docker networks
+- Docker Compose
+- Docker Swarm
+- Docker Stack
+- Integrating Docker with Jenkins
+
+## Module 9 — Kubernetes
+- Why Kubernetes exists
+- Introduction to Kubernetes
+- Kubernetes architecture (etcd, API server, scheduler, controller manager, kubelet, kube-proxy)
+- Kubernetes objects: pods, services, deployments
+- Basic kubectl commands
+- YAML manifests
+- Labels and selectors
+- Services
+- ReplicationController and ReplicaSets
+- Deployments
+- Horizontal Pod Autoscaler (HPA)
+- StatefulSets and DaemonSets
+- ConfigMaps and Secrets
+- Storage: volumes, PV, PVC
+- Namespaces
+- Ingress
+- RBAC: roles, bindings and service accounts
+- Resource quotas: requests and limits
+- Helm: charts and repositories
+- GitOps with ArgoCD
+- Network policies and CNI (Calico)
+- Affinities, node selector, taints and tolerations
+- PodDisruptionBudget
+- Deployment strategies (canary, blue-green, recreate, rolling)
+- Probes: liveness, readiness, startup
+- Jobs and CronJobs
+- Observability: Prometheus, Grafana, Loki, Promtail, alerting
+- Backup and disaster recovery: etcd and Velero
+- Cluster upgrades and lifecycle management
+- Troubleshooting: CrashLoopBackOff, ImagePullBackOff, pending pods, node not ready
+
+## Module 10 — Terraform
+- Why infrastructure automation
+- Introduction to Infrastructure as Code (IaC)
+- What is Terraform
+- Terraform architecture (CLI, providers, resources, state)
+- Installation and setup
+- Creating a resource with Terraform
+- Core commands: init, plan, apply, destroy
+- Providers and resources
+- Variables and tfvars
+- Outputs
+- State file and remote state
+- Terraform lifecycle and drift detection
+- Modules
+- Workspaces
+- Data sources
+- Provisioners
+- Dependency management
+- Terraform with AWS
+- Terraform with CI/CD (Jenkins)
+- State deep dive: locking, corruption, recovery
+- Security in Terraform (secrets, sensitive variables, IAM least privilege, tfsec)
+- Importing existing infrastructure
+
+## Module 11 — Security Tools
+- SonarQube
+- Trivy
+- Istio
+- HCP
+- TFsec
+- Open source web application security project
+
+## Module 12 — MCP with DevOps
+- Jenkins with MCP
+- Docker with MCP
+- Kubernetes with MCP
+- Terraform with MCP
+
+## Module 13 — Self-Paced Modules
+- Ansible
+- New Relic
+
+## Module 14 — Program Deliverables
+- From scratch to master level training
+- Resume building
+- Daily assignments
+- LinkedIn profile building
+- Interview guidance
+- Course completion certificate
+- Q&A sessions
+- Placement updates
+- On-demand video course content
+- Downloadable resources

@@ -1,0 +1,526 @@
+[
+  {
+    "label": "SESSION-1 CLOUD DEMO",
+    "module": "Cloud & AWS setup"
+  },
+  {
+    "label": "SESSION-2 AWS ACCOUNT CREATION",
+    "module": "Cloud & AWS setup"
+  },
+  {
+    "label": "SESSION-3 (EC2 PART-1)",
+    "module": "Cloud & AWS setup"
+  },
+  {
+    "label": "SESSION-4 (EC2 PART-2)",
+    "module": "Cloud & AWS setup"
+  },
+  {
+    "label": "SESSION-5 (LINUX INTRO, SYSTEM & HARDWARE COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-6 (LINUX: FILE COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-7 (LINUX: VI EDITOR, CP & MV COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-8 (LINUX: WC & USER, GROUP & PERMISSION COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-9 (LINUX OWNER & SEARCH COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-10 (LINUX: ZIP & UNZIP, WGET & SYSTEMCTL COMMANDS)",
+    "module": "Linux"
+  },
+  {
+    "label": "SESSION-11 (GIT INTRO)",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-12 GIT CLASS-2 (RESET, REVERT, REFLOG, CHERRY-PICK & RESTORE)",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-13 : GIT CLASS-3 (BRANCHES, MERGE, CHERRY-PICK, STASH)",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-14 : GIT CLASS-4 (GITHUB INTRO)",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-15 : GIT CLASS-5 (GITHUB PART-2)",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-16 : GITHUB & BITBUCKET LAST CLASS",
+    "module": "Git, GitHub & Bitbucket"
+  },
+  {
+    "label": "SESSION-17 : JENKINS INTRO",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-18 : JENKINS INTEGRATION WITH GIT",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "jenkins install commands",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "jenkins install commands (2)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-19 : JENKINS INTEGRATION WITH MAVEN & TOMCAT",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "tomcat-install-commands",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-20 : JENKINS INTEGRATION WITH NEXUS",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "Nexus-Latest-Commands",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "nexus setup commands",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-21 : JENKINS (MASTER & SLAVE)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-22 (USER MANAGEMENT & BACKUP)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-23 (JENKINS PIPELINE PART-1)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "Jenkinsfile",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-24 (JENKINS : VARIABLES & POST BUILD ACTIONS & INPUT)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "todays pipeline notes (1)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-25 (JENKINS : THOTTLE BUILDS, UPSTREAM & DOWN STREAM, PARAMETERS)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-27 (JENKINS with SONAR PART-1)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-28 (JENKINS WITH SONAR PART-2)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "sonar-commands",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "Jenkinsfile (2)",
+    "module": "Jenkins & CI/CD"
+  },
+  {
+    "label": "SESSION-29 (DOCKER INTRO)",
+    "module": "Docker"
+  },
+  {
+    "label": "todays command (4)",
+    "module": "Docker"
+  },
+  {
+    "label": "DOCKER CLASS-1 (2)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-30 (DOCKER FILE PART-1)",
+    "module": "Docker"
+  },
+  {
+    "label": "docker class-2",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-31 (DOCKER FILE PART-2)",
+    "module": "Docker"
+  },
+  {
+    "label": "Dockerfile-notes",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-32 (DOCKER FILE FOR PYTHON, NODE & DATABASE)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-33 (PRODUCTION GRADE DOCKER FILES)",
+    "module": "Docker"
+  },
+  {
+    "label": "prod-grade-Dockerfile's",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-34 (MULTI STAGE DOCKERFILE)",
+    "module": "Docker"
+  },
+  {
+    "label": "multi-stage-dockerfile",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-35 (DOCKER VOLUMES)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-36 (DOCKER NETWORKS)",
+    "module": "Docker"
+  },
+  {
+    "label": "docker-weekend-task",
+    "module": "Docker"
+  },
+  {
+    "label": "DOCKER FULL NOTES (5)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-37 (DOCKER COMPOSE PART-1)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-38 (DOCKER COMPOSE PART-2)",
+    "module": "Docker"
+  },
+  {
+    "label": "compose-file",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-39 (DOCKER SWARM)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-40 (DOCKER STACK)",
+    "module": "Docker"
+  },
+  {
+    "label": "maven-install-commands",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-41 (ECR & ECS)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-42: DOCKER PROJECT-1 (JAVA APPLICATION)",
+    "module": "Docker"
+  },
+  {
+    "label": "DOCKER PROJECT PIPELINE FOR DOCKER WEBAPP",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-43 (JUST AN INTERACTION SESSION)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-44 (RESTART POLICIES)",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-45 JENKINS & DOCKER INTERVIEW QUESTIONS",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-46 (DOCKER SCENARIOS EXPLAINED)",
+    "module": "Docker"
+  },
+  {
+    "label": "Docker_Senior_DevOps_Scenario_Interview_Prep",
+    "module": "Docker"
+  },
+  {
+    "label": "task",
+    "module": "Docker"
+  },
+  {
+    "label": "compose",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-47 : DOCKER PROJECT-2 (PYTHON LIBRARY APPLICATION)",
+    "module": "Docker"
+  },
+  {
+    "label": "Jenkins Interview Handbook-1",
+    "module": "Docker"
+  },
+  {
+    "label": "Docker Interview Handbook",
+    "module": "Docker"
+  },
+  {
+    "label": "DOCKER FULL NOTES",
+    "module": "Docker"
+  },
+  {
+    "label": "SESSION-48 (K8S CLASS-1 : INTRO)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "pod-manifestfile",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-49 (K8S CLASS-2 : KOPS, PODS, LABELS & SELECTORS)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-2",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-50 (K8S CLASS-3 : SERVICES)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-3",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-50 (K8S CLASS-4 : RC & RS)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-4",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-51 (K8S CLASS-5 : DEPLOYMENT)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-5",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-52 (K8S CLASS-6 : DAEMONSET & STATEFULSET)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-6",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-53 (K8S CLASS-7 : CONFIG MAPS & SECRETS)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-7",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-54 (K8S CLASS-8 : NAMESPACES & RESOURCE QUOTA)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-55 (K8S CLASS-9 : RBAC)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "class-8",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-56 (K8S CLASS-9 : AFFINITIES)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "affinities",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-57 (K8S CLASS-10 : TAINT, TOLERATIONS & VOLUMES)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "tolrations & volumes",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-58 (K8S CLASS-11 : HELM)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "helm-commands",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-59 (K8S CLASS-12 : PROMETHEUS & GRAFANA)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "prometheus-alertmanagement (2) (1)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-60 (K8S CLASS-13 : PROBES & JOBS)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SOME SCENARIOS",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "probes-and-jobs",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "KUBERNETES INGRESS (1)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-61 (K8S CLASS-14 : ALERT MANAGEMENT & INGRESS)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-62 (K8S CLASS-15 : ARGO CD PART-1)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "ARGOCD INSTALLING",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "SESSION-63 (K8S CLASS-16 : ARGO CD PART-2)",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "netpol",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "Live Class — 06 Nov 2026",
+    "module": "Kubernetes"
+  },
+  {
+    "label": "CLOUD DEMO-V2",
+    "module": "Notes"
+  },
+  {
+    "label": "EC2V2",
+    "module": "Notes"
+  },
+  {
+    "label": "LINUX CLASS-1 (12)",
+    "module": "Notes"
+  },
+  {
+    "label": "memes",
+    "module": "Notes"
+  },
+  {
+    "label": "LINUX CLASS-2 (17)",
+    "module": "Notes"
+  },
+  {
+    "label": "LINUX CLASS 3 (8)",
+    "module": "Notes"
+  },
+  {
+    "label": "LINUX CLASS 4 (5)",
+    "module": "Notes"
+  },
+  {
+    "label": "Linux_Commands_Student_Cheat_Sheet",
+    "module": "Notes"
+  },
+  {
+    "label": "GIT CLASS-1 (13)",
+    "module": "Notes"
+  },
+  {
+    "label": "GIT CLASS 2 (13)",
+    "module": "Notes"
+  },
+  {
+    "label": "GIT CLASS 3",
+    "module": "Notes"
+  },
+  {
+    "label": "Git_Visual_Student_Handbook",
+    "module": "Notes"
+  },
+  {
+    "label": "Git_Interview_Questions_and_Answers",
+    "module": "Notes"
+  },
+  {
+    "label": "LinkedIn Session by FLM Aug 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "freelancing add on session by FLM Sep 2026 part 1",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "freelancing add on session by FLM Sep 2026 part 2",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Class Notes - FLM Freelancing Session - Sep 13th 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Freelancing Guide for FLM Enrolled Students",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "MAANG Session by FLM Oct 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Resume Building Session by FLM Oct 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Day 1 Communication Skills Session by FLM Oct 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Day 2 Communication Skills Session by FLM Oct 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Day 3 Communication Skills Session by FLM Oct 2026",
+    "module": "Add-on sessions"
+  },
+  {
+    "label": "Day 4 Communication Skills Session by FLM Nov 2026",
+    "module": "Add-on sessions"
+  }
+]
