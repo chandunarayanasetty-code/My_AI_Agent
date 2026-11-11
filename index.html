@@ -857,7 +857,7 @@ async function seedIfEmpty(){
     if (!Array.isArray(raw) || !raw.length) return;
     let scope = '';
     try { const s = await fetch('devops-syllabus.txt', { cache: 'no-store' }); if (s.ok) scope = await s.text(); } catch (e) {}
-    await db.collection('courses').add({
+    const made = await db.collection('courses').add({
       name: 'DevOps with Multi Cloud (AWS + Azure)',
       scope: scope || 'DevOps with Multi Cloud (AWS + Azure)',
       progress: 0, confidence: null, quizTotal: 0, quizCorrect: 0,
@@ -865,6 +865,7 @@ async function seedIfEmpty(){
       sessions: raw.map((s, i) => ({ id: 's' + (i + 1), label: s.label, module: s.module, done: false }))
     });
     localStorage.setItem('ct-seeded-v1', '1');
+    if (made && made.id) openCourse(made.id);
   } catch (e) { /* leave the store empty */ }
 }
 
