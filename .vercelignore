@@ -1,4 +1,7 @@
 .git
+.vercel
+.env*
 node_modules
+dist
 backup
 *.log
