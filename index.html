@@ -846,7 +846,30 @@ $('addForm').addEventListener('submit', async e=>{
 });
 
 /* ---------- boot ---------- */
+/* First run in any browser: build the DevOps course from the bundled item list,
+   so a fresh origin (for example the Vercel site) is not an empty page. */
+async function seedIfEmpty(){
+  if (localStorage.getItem('ct-seeded-v1')) return;
+  try {
+    const res = await fetch('devops-sessions.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const raw = await res.json();
+    if (!Array.isArray(raw) || !raw.length) return;
+    let scope = '';
+    try { const s = await fetch('devops-syllabus.txt', { cache: 'no-store' }); if (s.ok) scope = await s.text(); } catch (e) {}
+    await db.collection('courses').add({
+      name: 'DevOps with Multi Cloud (AWS + Azure)',
+      scope: scope || 'DevOps with Multi Cloud (AWS + Azure)',
+      progress: 0, confidence: null, quizTotal: 0, quizCorrect: 0,
+      lessons: [], pending: null, askedQs: [], createdAt: Date.now(),
+      sessions: raw.map((s, i) => ({ id: 's' + (i + 1), label: s.label, module: s.module, done: false }))
+    });
+    localStorage.setItem('ct-seeded-v1', '1');
+  } catch (e) { /* leave the store empty */ }
+}
+
 render();
+let firstSnap = true;
 (async()=>{
   const timer = setTimeout(()=>{ if(!loaded){ loaded=true; $('summary').textContent='Could not load saved courses. Check that you are signed in.'; render(); }},10000);
   [db, sample] = await Promise.all([claude.use('db'), claude.use('sample')]);
@@ -856,6 +879,7 @@ render();
     courses = snap.docs.map(d=>({id:d.id,...d.data()}));
     if (selected && !courses.some(c=>c.id===selected)) selected=null;
     render();
+    if (firstSnap){ firstSnap = false; if (!courses.length) seedIfEmpty(); }
   }, err=>{ clearTimeout(timer); loaded=true; $('summary').textContent='Could not load courses: '+(err.message||err.code); render(); });
   if(!sample) document.querySelectorAll('[data-train],[data-quiz]').forEach(b=>b.disabled=true);
 })();
