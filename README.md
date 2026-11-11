@@ -22,6 +22,19 @@ Then open <http://localhost:4321>. Set a different port with `PORT=5000 npm star
 On Windows you can also just double-click **`run.cmd`**: it starts the server if it is not
 already listening on 4321 and opens the page.
 
+## Deploy (Vercel)
+
+- Production: <https://course-tracker-gold.vercel.app> - project `course-tracker`, connected to the
+  GitHub repo, so pushing to `main` redeploys it.
+- `vercel.json` + `build.js` publish only the browser files in `dist/`; the Node `server.js` is not
+  used on Vercel. The project's framework preset is `other`
+  (`vercel project update course-tracker --framework other`), which stops Vercel from using
+  `server.js` as a root entrypoint.
+- `api/backup.js` is a serverless stub returning 501: Vercel has no writable disk. The UI hides
+  **Save backup** and **Code** whenever the host is not `localhost`/`127.0.0.1`.
+- Storage is per origin. The local site keeps its own ticks; the Vercel site seeds the same
+  131-item course at 0% on first visit (guarded by `ct-seeded-v1` in `localStorage`).
+
 ## The code is served from the app too
 
 Everything lives in this folder and is reachable at the same origin:
