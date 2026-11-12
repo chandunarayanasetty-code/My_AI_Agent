@@ -707,7 +707,7 @@ function planHtml(c){
     h += `<div class="nextup"><b>Portal route complete.</b><div class="small">All ${p.route.length} items are ticked. Move to the full-syllabus gap map, then run mock interviews and publish the portfolio.</div></div>`;
   }
   h += `<div class="planpace"><label for="planHours">Study pace</label>
-    <select id="planHours">${[5, 8, 10, 15, 20, 25].map(v => `<option value="${v}"${v === p.hours ? ' selected' : ''}>${v} h per week</option>`).join('')}</select>
+    <select id="planHours">${[5, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60].map(v => `<option value="${v}"${v === p.hours ? ' selected' : ''}>${v} h per week</option>`).join('')}</select>
     <span class="small">~${p.weekCount} week${p.weekCount === 1 ? '' : 's'} \u00b7 portal finish around <b>${fmtDate(p.finish)}</b>${p.gap ? ` \u00b7 full syllabus around <b>${fmtDate(p.fullFinish)}</b>` : ''}</span>
     <span class="small" id="planMsg"></span></div>`;
   h += `<div class="sec"><h3>Critical path</h3>

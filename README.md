@@ -119,7 +119,7 @@ What the panel gives you:
 - **Exact route**: every portal item numbered once in dependency order (cloud -> Linux -> Git ->
   Jenkins -> Docker -> Kubernetes -> career). Notes are moved next to the module they revise.
 - **Next exact step**: the first unticked item, with its module, type and study estimate.
-- **Pace and projection**: choose 5/8/10/15/20/25 hours per week; the week-by-week route and finish
+- **Pace and projection**: choose 5, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50 or 60 hours per week; the week-by-week route and finish
   date are recomputed. The pace is stored in `localStorage` (`ct-plan-hours`).
 - **Week-by-week route**: every remaining step placed into a week, with a recall drill and a
   pass/fail milestone when a stage finishes.
