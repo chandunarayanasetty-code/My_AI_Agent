@@ -100,6 +100,49 @@ details.hl summary{cursor:pointer;font-weight:600}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes s{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.spin{animation:none}.bar>i{transition:none}}
+/* Perfect planning */
+select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+.planbtn{border-color:var(--accent);color:var(--accent);font-weight:600;background:var(--accent-soft)}
+.planlink{border:1px solid var(--line);background:var(--bg);color:var(--accent);font-size:12px;min-height:28px;padding:3px 9px}
+.planlink:hover{border-color:var(--accent)}
+.plan{padding:20px;display:flex;flex-direction:column;gap:16px;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.plan a{color:var(--accent)}
+.planhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.planstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--bg)}
+.stat b{display:block;font-family:var(--font-display);font-size:20px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.nextup{border:1px solid var(--accent);background:var(--accent-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.nextrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stepno{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-weight:700;font-size:11.5px;font-variant-numeric:tabular-nums;flex:none}
+.planpace{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--bg)}
+.planpace label{margin:0}
+.stagerail{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.stagecard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.stagecard.active{border-color:var(--accent);background:var(--accent-soft)}
+.stagecard .bar{height:6px}
+.planblock{margin-top:2px}
+.planitem{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.planitem:last-child{border-bottom:0}
+.planitem.done{color:var(--muted)}
+.planitem.done .plabel{text-decoration:line-through}
+.planitem.next{background:var(--accent-soft);margin:0 -6px;padding:6px;border-radius:6px}
+.planitem .meta{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.plabel{overflow-wrap:anywhere;min-width:0}
+.kbadge{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--track);color:var(--muted);white-space:nowrap}
+.kbadge.learn{background:var(--accent-soft);color:var(--accent)}
+.kbadge.reference{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.kbadge.practice{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.kbadge.interview{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.kbadge.career{background:var(--track);color:var(--fg)}
+.wk{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-top:6px}
+.wk summary{cursor:pointer;font-weight:600}
+.plancheck{font-size:12px;color:var(--accent);font-weight:600;margin-top:6px}
+.topics{margin:6px 0;padding-left:20px;font-size:13px}
+.topics li{margin:3px 0}
+.gapnote{border-left:2px solid var(--accent);padding-left:10px;margin-top:6px;font-size:12.5px;color:var(--muted)}
+.planlist{display:flex;flex-direction:column;gap:2px}
+@media(max-width:600px){.planstats{grid-template-columns:1fr 1fr}.planitem .meta{width:100%;margin-left:36px;justify-content:flex-start}}
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
 
@@ -549,7 +592,7 @@ function renderTable(){
       <td><button class="cname" data-open="${c.id}">${esc(c.name)}</button><div class="small">${(c.quizTotal||0)} quiz answers</div></td>
       <td><div class="scope">${esc(displayScope(c.scope))}</div></td>
       <td><div class="pcell"><span class="num">${p}%</span><div class="bar"><i style="width:${p}%"></i></div></div></td>
-      <td><button class="primary" data-train="${c.id}" ${s.busy||done||blockRange(c).marked===0?'disabled':''}>${s.busy==='train'?'<span class="spin"></span>Preparing…':done?'Course done':c.pending?'Open lesson':blockRange(c).marked===0?'Tick items first':blockLabel(c)}</button></td>
+      <td><button class="primary" data-train="${c.id}" ${s.busy||done||blockRange(c).marked===0?'disabled':''}>${s.busy==='train'?'<span class="spin"></span>Preparing…':done?'Course done':c.pending?'Open lesson':blockRange(c).marked===0?'Tick items first':blockLabel(c)}</button><div style="margin-top:6px"><button class="planlink" data-plan="${c.id}">Perfect plan</button></div></td>
       <td><button data-quiz="${c.id}" ${s.busy||p<=0?'disabled':''} title="${p<=0?'Complete some training first':''}">${s.busy==='quiz'?'<span class="spin"></span>Building…':'Quiz me'}</button></td>
       <td><span class="pill ${confClass(c.confidence)}">${c.confidence==null?'Not tested':Math.round(c.confidence)+'%'}</span></td>
     </tr>`;
@@ -591,20 +634,263 @@ function sessionsView(c){
   }
   return h + '</div>';
 }
+function fmtMin(m){
+  m = Math.max(0, Math.round(m || 0));
+  if (m < 60) return m + ' min';
+  const h = Math.floor(m / 60), r = m % 60;
+  return h + ' h' + (r ? ' ' + r + ' min' : '');
+}
+function fmtHours(m){
+  const h = (m || 0) / 60;
+  return (h < 10 ? Math.round(h * 10) / 10 : Math.round(h)) + ' h';
+}
+function fmtDate(d){
+  try { return d.toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' }); }
+  catch (e) { return d.toDateString(); }
+}
+function planOpenFor(c){
+  const s = st(c.id);
+  if (s.planOpen === undefined) {
+    try { s.planOpen = localStorage.getItem('ct-plan-open') === c.id; }
+    catch (e) { s.planOpen = false; }
+  }
+  return s.planOpen;
+}
+function setPlanOpen(c, open){
+  st(c.id).planOpen = open;
+  try {
+    if (open) localStorage.setItem('ct-plan-open', c.id);
+    else if (localStorage.getItem('ct-plan-open') === c.id) localStorage.removeItem('ct-plan-open');
+  } catch (e) {}
+}
+function planItemHtml(x, next){
+  const isNext = next && x.step === next.step;
+  return `<div class="planitem${x.done ? ' done' : ''}${isNext ? ' next' : ''}">
+    <span class="stepno">${x.step}</span>
+    <span class="plabel">${esc(x.label)}</span>
+    <span class="meta"><span class="kbadge ${x.kind}">${kindLabel(x.kind)}</span><span>${x.min} min</span>${x.done ? '<span>done</span>' : ''}</span>
+  </div>`;
+}
+function planHtml(c){
+  const p = buildPlan(c);
+  if (!p.route.length) return `<section class="panel plan" id="planPanel">
+    <div class="planhead"><div><div class="tag">Perfect planning</div><h2>No route yet</h2>
+      <div class="small">This course has no portal item list and no syllabus scope. Add the syllabus with <b>Edit scope</b> (or paste the portal list) and the route will be generated from it.</div></div>
+      <div class="actions"><button class="ghost" data-planclose="1">Hide</button></div></div></section>`;
+  const next = p.next;
+  const trainHint = isItemCourse(c)
+    ? `If it is already ticked, use <b>Train marked (${markedItems(c).length})</b> to revise only your ticks.`
+    : `Use <b>Train ${Math.round(c.progress || 0)}% \u2192 100%</b> to study the next block.`;
+  let h = `<section class="panel plan" id="planPanel">
+    <div class="planhead"><div><div class="tag">Perfect planning</div>
+      <h2>Exact route to finish ${esc(c.name)}</h2>
+      <div class="small">Built from the brochure, the ${p.route.length}-item portal list, your ticks, notes, project briefs, interview banks and official docs. Times are study estimates, not video lengths.</div></div>
+      <div class="actions"><button data-plancopy="1">Copy route map</button><button class="ghost" data-planclose="1">Hide</button></div></div>
+    <div class="planstats">
+      <div class="stat"><b>${p.remaining.length}</b><span>steps left / ${p.route.length}</span></div>
+      <div class="stat"><b>${fmtMin(p.totalMinutes)}</b><span>study time left</span></div>
+      <div class="stat"><b>${p.weekCount}</b><span>weeks at ${p.hours} h/week</span></div>
+      <div class="stat"><b>${Math.round(c.progress || 0)}%</b><span>${isItemCourse(c) ? 'portal completion' : 'course progress'}</span></div>
+      ${p.gap ? `<div class="stat"><b>${fmtHours(p.fullMinutes)}</b><span>full-syllabus time</span></div>` : ''}
+    </div>`;
+  if (p.gap) h += `<div class="small">Full-syllabus mastery adds about ${fmtMin(p.gap.minutes)} for ${p.gap.missing} unrecorded and ${p.gap.partial} partly covered brochure modules, about ${p.fullWeeks} weeks all-in at this pace. The portal can reach 100% sooner; the gap map is what makes the result interview-ready.</div>`;
+  if (next) {
+    const after = p.remaining.slice(1, 4).map(x => esc(x.label)).join(' \u2192 ');
+    h += `<div class="nextup"><div class="small">Next exact step \u00b7 ${next.step} of ${p.route.length} \u00b7 ${esc(next.module)}</div>
+      <div class="nextrow"><span class="stepno">${next.step}</span><b>${esc(next.label)}</b><span class="kbadge ${next.kind}">${kindLabel(next.kind)}</span><span class="small">${next.min} min</span></div>
+      ${after ? `<div class="small">Then: ${after}${p.remaining.length > 4 ? ' \u2192 \u2026' : ''}</div>` : ''}
+      <div class="small">Do it, then tick it in Portal progress. ${trainHint}</div></div>`;
+  } else {
+    h += `<div class="nextup"><b>Portal route complete.</b><div class="small">All ${p.route.length} items are ticked. Move to the full-syllabus gap map, then run mock interviews and publish the portfolio.</div></div>`;
+  }
+  h += `<div class="planpace"><label for="planHours">Study pace</label>
+    <select id="planHours">${[5, 8, 10, 15, 20, 25].map(v => `<option value="${v}"${v === p.hours ? ' selected' : ''}>${v} h per week</option>`).join('')}</select>
+    <span class="small">~${p.weekCount} week${p.weekCount === 1 ? '' : 's'} \u00b7 portal finish around <b>${fmtDate(p.finish)}</b>${p.gap ? ` \u00b7 full syllabus around <b>${fmtDate(p.fullFinish)}</b>` : ''}</span>
+    <span class="small" id="planMsg"></span></div>`;
+  h += `<div class="sec"><h3>Critical path</h3>
+    <div class="small">The order is dependency-driven, not portal order: Linux before Git, Jenkins, Docker and Kubernetes; Git before CI; CI before Docker delivery; Docker before Kubernetes; cloud before everything.</div>
+    <div class="stagerail">`;
+  p.stages.forEach((stage, i) => {
+    const pct = stage.total ? Math.round(stage.done / stage.total * 100) : 0;
+    const active = stage.next && next && stage.key === next.stageKey;
+    h += `<div class="stagecard${active ? ' active' : ''}"><div><b>${i + 1}. ${esc(stage.title)}</b></div>
+      <div class="small">${stage.done}/${stage.total} done \u00b7 ${fmtHours(stage.minutes)}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="small">${esc(stage.why)}</div>
+      ${active ? `<div class="small"><b>Next:</b> ${esc(stage.next.label)}</div>` : ''}</div>`;
+  });
+  h += `</div></div>`;
+  h += planWeeksHtml(p);
+  h += planRouteHtml(p);
+  if (p.gap) h += planGapHtml(p);
+  h += planProtocolHtml(p);
+  h += planSourcesHtml(p);
+  return h + '</section>';
+}
+function planWeeksHtml(p){
+  if (!p.weeks.length) return `<div class="sec"><h3>Week-by-week route</h3><div class="small">Nothing left in the portal route. Use the gap map below, then revise with Train marked.</div></div>`;
+  let h = `<div class="sec"><h3>Week-by-week route</h3>
+    <div class="small">${p.weeks.length} week${p.weeks.length === 1 ? '' : 's'} at ${p.hours} h/week. Each week is capped at your pace; one long project may spill into the next week. Checkpoints are pass/fail: if you cannot do the checkpoint, repeat the week's recall drill before moving on.</div>`;
+  p.weeks.forEach((w, i) => {
+    const stages = [...new Set(w.items.map(x => x.stageTitle))];
+    const focus = stages.slice(0, 2).join(' \u2192 ') + (stages.length > 2 ? ' +' + (stages.length - 2) : '');
+    h += `<details class="wk"${i === 0 ? ' open' : ''}><summary>Week ${i + 1} \u00b7 ${fmtHours(w.min)} \u00b7 ${w.items.length} step${w.items.length === 1 ? '' : 's'} \u00b7 ${esc(focus)}</summary>
+      <div class="planlist">${w.items.map(x => planItemHtml(x, p.next)).join('')}</div>`;
+    if (i > 0) h += `<div class="plancheck">Spaced review first: spend 15 minutes recalling last week's items before starting.</div>`;
+    if (w.milestones && w.milestones.length) {
+      h += w.milestones.map(st => `<div class="plancheck">Milestone \u2014 ${esc(st.title)}: ${esc(st.checkpoint)}</div>`).join('');
+    } else {
+      h += `<div class="plancheck">Recall drill: close the notes and explain the week's first and last topic out loud.</div>`;
+    }
+    h += `</details>`;
+  });
+  return h + `</div>`;
+}
+function planRouteHtml(p){
+  let h = `<details class="hl planblock"><summary><b>Full route map</b> \u00b7 ${p.route.length} exact steps \u00b7 ${p.remaining.length} left</summary>
+    <div class="small" style="margin:6px 0 10px">Steps are numbered once, in dependency order. Notes are moved next to the module they revise; career items close the route. Done items stay visible so you can see the whole map.</div>`;
+  p.stages.forEach((stage, i) => {
+    const active = p.next && stage.key === p.next.stageKey;
+    h += `<details class="hl"${active ? ' open' : ''}><summary>${i + 1}. ${esc(stage.title)} \u00b7 ${stage.done}/${stage.total} done \u00b7 ${fmtHours(stage.minutes)}</summary>
+      <div class="planlist" style="margin-top:8px">${stage.items.map(x => planItemHtml(x, p.next)).join('')}</div>
+      <div class="small" style="margin-top:6px"><b>Checkpoint:</b> ${esc(stage.checkpoint)}</div>
+    </details>`;
+  });
+  return h + `</details>`;
+}
+function planGapHtml(p){
+  const g = p.gap;
+  const rows = g.modules.filter(m => m.status !== 'covered');
+  const covered = g.modules.filter(m => m.status === 'covered');
+  const firstMissing = rows.findIndex(m => m.status === 'missing');
+  let h = `<div class="sec"><h3>Full-syllabus gap map</h3>
+    <div class="small">The brochure has 14 modules; the portal recordings stop at Session 63. These ${rows.length} modules are unrecorded or only partly covered. This is the difference between ticking 131 items and being able to answer the interview questions the brochure promises.</div>
+    <div class="planstats">
+      <div class="stat"><b>${g.missing}</b><span>unrecorded modules</span></div>
+      <div class="stat"><b>${g.partial}</b><span>partly covered</span></div>
+      <div class="stat"><b>${fmtMin(g.minutes)}</b><span>gap study estimate</span></div>
+      <div class="stat"><b>${g.covered}</b><span>fully covered</span></div>
+    </div>`;
+  rows.forEach((m, i) => {
+    const badge = m.status === 'missing' ? 'interview' : 'reference';
+    const statusText = m.status === 'missing' ? 'No recording' : 'Partly covered';
+    h += `<details class="hl planblock"${i === firstMissing ? ' open' : ''}><summary>${esc(m.rawTitle)} \u00b7 <span class="kbadge ${badge}">${statusText}</span> \u00b7 ${fmtMin(m.minutes)}</summary>
+      <div class="small" style="margin-top:6px"><b>Portal basis:</b> ${esc(m.by)}</div>
+      <div class="small">${esc(m.why)}</div>
+      <div class="small" style="margin-top:8px"><b>${m.status === 'missing' ? 'Exact study order' : 'Missing topics to add'}:</b></div>
+      <ol class="topics">${m.missing.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+      <div class="gapnote"><b>Checkpoint:</b> ${esc(m.checkpoint)}</div>
+    </details>`;
+  });
+  if (covered.length) {
+    h += `<details class="hl planblock"><summary>Fully covered by the portal (${covered.length})</summary><div class="small" style="margin-top:6px">${covered.map(m => esc(m.rawTitle)).join(' \u00b7 ')}</div></details>`;
+  }
+  return h + `</div>`;
+}
+function planProtocolHtml(p){
+  const c = p.course;
+  return `<details class="hl planblock" open><summary><b>Best-results protocol</b> \u00b7 how to study each step</summary>
+    <div class="small" style="margin-top:8px">The route is only half the result. This loop is what turns watched sessions into recall you can use in an interview.</div>
+    <ol class="topics">
+      <li><b>Preview (5 min):</b> read the item title and write two questions you expect it to answer.</li>
+      <li><b>Learn (the item estimate):</b> watch or read once, without pausing to copy slides.</li>
+      <li><b>Do (30 min):</b> repeat the commands or manifest on your own EC2 box; break it once and fix it.</li>
+      <li><b>Recall (10 min):</b> close everything and explain it aloud, then write a five-line summary from memory.</li>
+      <li><b>Space (10/10/20/20 min):</b> review the summary the next day, day 3, day 7 and day 21. This is the highest-yield habit in the plan.</li>
+    </ol>
+    <div class="small"><b>Portfolio artifacts from the portal:</b> Docker Project 1 (Java), Docker Project 2 (Python) and the Docker webapp pipeline become three repo READMEs; the Kubernetes scenarios become a GitOps repo with ArgoCD, probes and ingress. Link them from your resume.</div>
+    <div class="small"><b>Interview cadence:</b> after Docker, use SESSION-45 plus the Jenkins/Docker handbooks for one mock per week. After Kubernetes, add the senior scenario file and the MAANG session. Record each answer, then rewrite the weak ones.</div>
+    <div class="small"><b>Tick rule:</b> tick an item only when you can do its checkpoint or explain it without notes. If you cannot, leave it unticked; Train marked will keep it in revision.</div>
+    <div class="small"><b>If time is short:</b> do the Learn items in Cloud, Linux, Git, Jenkins, Docker and Kubernetes first, plus the two Docker projects and one interview handbook. That is the minimum viable mastery lane, not 100% portal completion, but it protects the interview result.</div>
+    <div class="small"><b>Use the app:</b> tick as you finish, then press <b>Train marked (${isItemCourse(c) ? markedItems(c).length : Math.round(c.progress || 0)})</b> for a revision pass; <b>Clear module</b> when a module no longer needs revision.</div>
+  </details>`;
+}
+function planSourcesHtml(p){
+  const count = k => p.route.filter(x => x.kind === k).length;
+  return `<details class="hl planblock"><summary><b>References used</b> \u00b7 local sources and official docs</summary>
+    <div class="small" style="margin-top:8px"><b>Local sources</b></div>
+    <ul class="topics">
+      <li><b>Brochure syllabus</b> \u2014 14 modules, parsed into module titles and topic lists; defines full-syllabus coverage and the gap map.</li>
+      <li><b>Portal item list</b> \u2014 ${p.route.length} items in 8 modules; defines completion and the exact step order. Recordings stop at Session 63 (06 Nov 2026).</li>
+      <li><b>Notes and reference items</b> \u2014 ${count('reference')} command sheets, class notes, cheat sheets and handbooks; used as revision, not as first-pass teaching.</li>
+      <li><b>Practice items</b> \u2014 ${count('practice')} projects, tasks and pipelines; used as portfolio evidence.</li>
+      <li><b>Interview items</b> \u2014 ${count('interview')} question banks, scenarios and handbooks; used for weekly mocks after Docker and Kubernetes.</li>
+      <li><b>Career items</b> \u2014 ${count('career')} add-on sessions on LinkedIn, freelancing, MAANG, resume and communication.</li>
+    </ul>
+    <div class="small"><b>Official docs for the gap modules</b></div>
+    <ul class="topics">
+      <li><a href="https://docs.aws.amazon.com/" target="_blank" rel="noopener">AWS documentation</a> \u00b7 <a href="https://learn.microsoft.com/azure/" target="_blank" rel="noopener">Azure documentation</a></li>
+      <li><a href="https://kubernetes.io/docs/" target="_blank" rel="noopener">Kubernetes</a> \u00b7 <a href="https://argo-cd.readthedocs.io/" target="_blank" rel="noopener">Argo CD</a> \u00b7 <a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm</a> \u00b7 <a href="https://prometheus.io/docs/" target="_blank" rel="noopener">Prometheus</a></li>
+      <li><a href="https://docs.docker.com/" target="_blank" rel="noopener">Docker</a> \u00b7 <a href="https://www.jenkins.io/doc/" target="_blank" rel="noopener">Jenkins</a> \u00b7 <a href="https://developer.hashicorp.com/terraform/docs" target="_blank" rel="noopener">Terraform</a></li>
+      <li><a href="https://docs.ansible.com/" target="_blank" rel="noopener">Ansible</a> \u00b7 <a href="https://docs.newrelic.com/" target="_blank" rel="noopener">New Relic</a> \u00b7 <a href="https://trivy.dev/" target="_blank" rel="noopener">Trivy</a> \u00b7 <a href="https://istio.io/latest/docs/" target="_blank" rel="noopener">Istio</a> \u00b7 <a href="https://owasp.org/" target="_blank" rel="noopener">OWASP</a> \u00b7 <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP</a></li>
+    </ul>
+    <div class="small"><b>Study method</b>: active recall and spaced repetition (Roediger &amp; Karpicke, 2006; Dunlosky et al., 2013), interleaved practice, and project-based learning. The weekly recall drills and day 1/3/7/21 reviews apply those findings to this route.</div>
+    <div class="small"><b>Estimates</b>: learn 90 min (45 for interaction/live sessions), build 60-120 min, interview 45 min, reference 20-45 min, career 60 min. Adjust after week 1 using your actual pace.</div>
+  </details>`;
+}
+function planText(c){
+  const p = buildPlan(c);
+  const lines = [];
+  lines.push('PERFECT PLANNING \u2014 ' + c.name);
+  lines.push('Generated ' + fmtDate(new Date()) + ' \u00b7 pace ' + p.hours + ' h/week');
+  lines.push(`Portal: ${p.route.length} steps, ${p.remaining.length} left, ${fmtMin(p.totalMinutes)} study time, about ${p.weekCount} weeks (finish around ${fmtDate(p.finish)}).`);
+  if (p.gap) lines.push(`Full syllabus adds about ${fmtMin(p.gap.minutes)} for ${p.gap.missing} unrecorded and ${p.gap.partial} partly covered modules; about ${p.fullWeeks} weeks total.`);
+  lines.push('');
+  if (p.next) lines.push(`NEXT: step ${p.next.step} \u2014 ${p.next.label} (${kindLabel(p.next.kind)}, ${p.next.min} min, ${p.next.module}).`);
+  else lines.push('NEXT: portal route complete. Move to the gap map and mock interviews.');
+  lines.push('');
+  lines.push('WEEK-BY-WEEK');
+  p.weeks.forEach((w, i) => {
+    lines.push(`Week ${i + 1} (${fmtHours(w.min)}, ${w.items.length} steps): ` + w.items.map(x => x.label).join(' | '));
+    if (i > 0) lines.push('  Spaced review: recall last week first (15 min).');
+    if (w.milestones && w.milestones.length) w.milestones.forEach(st => lines.push('  Milestone \u2014 ' + st.title + ': ' + st.checkpoint));
+    else lines.push('  Recall drill: explain the first and last topic without notes.');
+  });
+  lines.push('');
+  lines.push('FULL ROUTE MAP');
+  p.stages.forEach((st, i) => {
+    lines.push(`\n${i + 1}. ${st.title} (${st.done}/${st.total}, ${fmtHours(st.minutes)})`);
+    st.items.forEach(x => lines.push(`${x.step}. [${x.done ? 'x' : ' '}] ${x.label} \u2014 ${kindLabel(x.kind)}, ${x.min} min`));
+    lines.push('  Checkpoint: ' + st.checkpoint);
+  });
+  if (p.gap) {
+    lines.push('\nFULL-SYLLABUS GAP MAP');
+    p.gap.modules.filter(m => m.status !== 'covered').forEach(m => {
+      lines.push(`${m.rawTitle} (${m.status === 'missing' ? 'no recording' : 'partly covered'}, ${fmtMin(m.minutes)})`);
+      lines.push('  Missing: ' + m.missing.join(', '));
+      lines.push('  Checkpoint: ' + m.checkpoint);
+    });
+  }
+  lines.push('\nBEST-RESULTS PROTOCOL');
+  lines.push('1. Preview 5 min: write two questions the item should answer.');
+  lines.push('2. Learn: watch/read once without copying slides.');
+  lines.push('3. Do 30 min: repeat the commands or manifest on your own EC2 box.');
+  lines.push('4. Recall 10 min: close everything, explain aloud, write five lines from memory.');
+  lines.push('5. Space: review day 1, day 3, day 7 and day 21.');
+  lines.push('6. Tick only when you can explain it or pass the checkpoint.');
+  lines.push('7. Portfolio: Docker Project 1, Docker Project 2, the Docker webapp pipeline, and a Kubernetes GitOps repo.');
+  lines.push('8. Interviews: one mock per week after Docker; add senior scenarios and MAANG after Kubernetes.');
+  lines.push('\nSOURCES');
+  lines.push('Brochure syllabus (14 modules), portal item list (recordings through Session 63), notes/reference items, project briefs, interview banks, add-on career sessions, official AWS/Azure/Kubernetes/Docker/Jenkins/Terraform/ArgoCD/Helm/Prometheus/Ansible/New Relic/Trivy/Istio/OWASP/MCP docs, and active-recall/spaced-repetition research.');
+  return lines.join('\n');
+}
 function renderDesk(){
   const c = courses.find(x=>x.id===selected);
   const host = $('deskHost');
   if (!c){ host.innerHTML=''; return; }
   const s = st(c.id), p = c.progress||0;
   const list = c.sessions || [];
+  const planOpen = planOpenFor(c);
   let h = `<section class="panel desk"><div class="deskhead"><div><h2>${esc(c.name)}</h2>
     <div class="small">${p}% covered · confidence ${c.confidence==null?'not tested yet':Math.round(c.confidence)+'%'} · ${c.quizCorrect||0}/${c.quizTotal||0} correct overall</div></div>
     <div class="actions">${list.length ? '' : `<div class="progset"><label for="progRange">Progress</label><input id="progRange" type="range" min="0" max="100" step="1" value="${p}" aria-label="Course completion percent"><span class="num progval">${p}%</span></div>`}
+    <button class="planbtn" data-plan="${c.id}" title="Exact, dependency-ordered route to finish with the best result">${planOpen ? 'Hide perfect plan' : 'Perfect planning'}</button>
     <button class="ghost" data-edit="${c.id}">Edit scope</button>
     ${s.confirmDelete?`<button class="danger" data-del-yes="${c.id}">Yes, delete course</button><button class="ghost" data-del-no="1">Keep</button>`:`<button class="ghost danger" data-del="${c.id}">Delete</button>`}
     <button class="ghost" data-close="1">Close</button></div></div>`;
   if (s.err) h += `<div class="err">${esc(s.err)}</div>`;
   if (s.editing) h += `<div class="sec"><label for="editScope">Course scope</label><textarea id="editScope">${esc(c.scope||'')}</textarea><div class="actions"><button class="primary" data-saveedit="${c.id}">Save scope</button><button data-canceledit="1">Cancel</button></div></div>`;
+  if (planOpen) h += planHtml(c);
   h += sessionsView(c);
   h += `<div class="cols"><div class="sec"><h3>Lessons</h3>`;
   if (c.pending){
@@ -646,6 +932,28 @@ function quizHtml(c,s){
 function ref(id){ return db.collection('courses').doc(id); }
 async function save(id, patch){ try{ await ref(id).update(patch); }catch(e){ st(id).err='Could not save: '+(e.message||e.code); render(); } }
 function openCourse(id){ selected=id; try{localStorage.setItem('ct-sel',id)}catch(e){} render(); $('deskHost').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function togglePlan(id){
+  const c = courses.find(x => x.id === id); if (!c) return;
+  const open = !planOpenFor(c);
+  setPlanOpen(c, open);
+  if (selected !== c.id) openCourse(c.id); else render();
+  if (open) setTimeout(() => { const el = $('planPanel'); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }, 80);
+}
+async function copyPlan(){
+  const c = courses.find(x => x.id === selected); if (!c) return;
+  const text = planText(c);
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+  if (!ok) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove();
+    } catch (e) {}
+  }
+  const msg = $('planMsg');
+  if (msg) msg.textContent = ok ? 'Route map copied.' : 'Copy failed; select the text manually.';
+}
 
 function isItemCourse(c){ return !!(c.sessions && c.sessions.length); }
 function markedItems(c){ return (c.sessions || []).filter(s => s.done); }
@@ -662,6 +970,252 @@ function blockLabel(c){
 function scopeFor(c){
   if (isItemCourse(c)) return markedItems(c).map(s => '- ' + s.module + ': ' + s.label).join('\n');
   return c.scope || '';
+}
+
+/* ---------- perfect planning ----------
+   A deterministic route map built from three local sources:
+   1. the brochure syllabus (defines full-syllabus coverage),
+   2. the portal item list (defines completion and the exact steps),
+   3. the learner's ticks (defines what is already done).
+   It separates "portal 100%" from "interview-ready mastery", because the
+   portal stops at Session 63 while the brochure has 14 modules. */
+const PLAN_STAGES = [
+  { key:'cloud', title:'Cloud & AWS setup', modules:['Cloud & AWS setup'], noteMatch:/CLOUD|EC2/i,
+    why:'A real AWS account and EC2 box are the lab for every later module.',
+    checkpoint:'Launch an EC2 instance, SSH in, and stop it without help.' },
+  { key:'linux', title:'Linux foundation', modules:['Linux'], noteMatch:/LINUX|COMMAND/i,
+    why:'Permissions, users, processes, systemd and archives are assumed by Jenkins, Docker and Kubernetes.',
+    checkpoint:'From memory: create a user, set permissions, zip a folder, start a service and find a file.' },
+  { key:'git', title:'Git, GitHub & Bitbucket', modules:['Git, GitHub & Bitbucket'], noteMatch:/GIT|Git_/i,
+    why:'Every pipeline starts with a commit; branching and conflict recovery are interview staples.',
+    checkpoint:'Resolve a merge conflict, recover a lost commit with reflog, and open a pull request.' },
+  { key:'jenkins', title:'CI/CD with Jenkins', modules:['Jenkins & CI/CD'], noteMatch:null,
+    why:'Jenkins is the automation spine that later builds, scans and ships Docker images.',
+    checkpoint:'Write a Jenkinsfile that builds, tests, scans with Sonar and archives an artifact.' },
+  { key:'docker', title:'Containers with Docker', modules:['Docker'], noteMatch:null,
+    why:'Docker is the largest portal module and the skill most DevOps interviews test first.',
+    checkpoint:'Ship a multi-stage image, run it with Compose, push to ECR and deploy to ECS.' },
+  { key:'k8s', title:'Kubernetes & GitOps', modules:['Kubernetes'], noteMatch:null,
+    why:'Kubernetes turns containers into a production platform; ArgoCD adds GitOps.',
+    checkpoint:'Deploy an app with probes, ConfigMap/Secret, ingress, HPA and an ArgoCD sync.' },
+  { key:'career', title:'Career & deliverables', modules:['Add-on sessions'], noteMatch:/memes/i,
+    why:'Resume, LinkedIn, communication and interview practice convert skills into offers.',
+    checkpoint:'Publish a portfolio repo, update LinkedIn, and complete one mock interview.' }
+];
+
+const SYLLABUS_COVERAGE = {
+  1:  { status:'covered', by:'Sessions 1-2 + CLOUD DEMO-V2', gap:[],
+        why:'Covered by the cloud demo and AWS account setup.', checkpoint:'' },
+  2:  { status:'covered', by:'Sessions 1-2 + CLOUD DEMO-V2', gap:[],
+        why:'Service and deployment models are introduced in the cloud demo.', checkpoint:'' },
+  3:  { status:'partial', by:'Sessions 5-10 + Linux notes', gap:['Networking commands','Package management','Disk and storage management','Log management','Text processing'],
+        why:'The recordings cover the basics; these five areas are the usual Linux interview gap.',
+        checkpoint:'From memory: open ports with ss, install a package, find a log entry, and process text with grep/awk/sed.' },
+  4:  { status:'covered', by:'Sessions 11-16 + Git notes and handbook', gap:[],
+        why:'Git, GitHub and Bitbucket are fully recorded, with notes and interview questions.', checkpoint:'' },
+  5:  { status:'missing', by:'No recording in the portal list', gap:[],
+        why:'Azure is half the course title and appears in AKS, ACR and Azure Pipelines interviews.',
+        checkpoint:'Deploy a VM, put it behind a load balancer, push an image to ACR, and run it on AKS.' },
+  6:  { status:'partial', by:'Sessions 1-4 (EC2) + Session 41 (ECR/ECS)', gap:['VPC','S3','EBS','IAM','RDS','ELB','Auto Scaling Group','EKS','SNS','CloudWatch','Route 53'],
+        why:'The portal only records EC2. VPC, S3, IAM, RDS and EKS are the AWS interview core.',
+        checkpoint:'Build a VPC with public/private subnets, an S3 bucket, an IAM role and an RDS instance; expose an app through an ALB.' },
+  7:  { status:'partial', by:'Sessions 17-36 + Jenkinsfiles', gap:['Multi-branch pipeline','Credentials and security'],
+        why:'Pipelines are covered; multi-branch and credentials are the usual senior follow-ups.',
+        checkpoint:'Create a multi-branch pipeline with credentials and a failing-build notification.' },
+  8:  { status:'covered', by:'Sessions 37-72 + Docker notes and projects', gap:[],
+        why:'Docker is the most completely recorded module, including two projects.', checkpoint:'' },
+  9:  { status:'partial', by:'Sessions 48-63 + Kubernetes YAML notes', gap:['Horizontal Pod Autoscaler (HPA)','PodDisruptionBudget','Deployment strategies','etcd and Velero backup','Cluster upgrades'],
+        why:'Core Kubernetes is covered; HPA, PDB, rollout strategies and backup are the senior gaps.',
+        checkpoint:'Add an HPA, a PDB, a canary rollout and a Velero backup to a running app.' },
+  10: { status:'missing', by:'No recording in the portal list', gap:[],
+        why:'Terraform is the IaC default in DevOps job specs and links AWS, Jenkins and Kubernetes.',
+        checkpoint:'Provision the same AWS stack twice (dev/prod) with modules and remote state; import one existing resource.' },
+  11: { status:'partial', by:'Sonar in Sessions 27-28 and 33-34; the rest is not recorded', gap:['Trivy','Istio','HCP','TFsec','OWASP'],
+        why:'Sonar is covered, but Trivy, Istio, tfsec and OWASP are common security-interview topics.',
+        checkpoint:'Scan an image with Trivy, add tfsec to a Terraform pipeline, and explain Istio mTLS.' },
+  12: { status:'missing', by:'No recording in the portal list', gap:[],
+        why:'MCP is new; one working integration separates you from tutorial-level candidates.',
+        checkpoint:'Expose Jenkins, Docker, Kubernetes and Terraform through MCP and complete one read-only task per tool.' },
+  13: { status:'missing', by:'No recording in the portal list', gap:[],
+        why:'Ansible and New Relic appear in the brochure and in SRE/DevOps job descriptions.',
+        checkpoint:'Write an Ansible playbook that configures the Docker host, then add a New Relic dashboard.' },
+  14: { status:'partial', by:'Add-on sessions 121-131', gap:['Course completion certificate','Placement updates','Daily assignment cadence'],
+        why:'Add-ons cover the career skills; these are the remaining administrative deliverables.',
+        checkpoint:'Publish the portfolio repo, update LinkedIn, and request the certificate after the final project.' }
+};
+
+function parseSyllabus(text){
+  const raw = String(text || '');
+  const mods = []; let cur = null;
+  for (const line0 of raw.split(/\r?\n/)) {
+    const line = line0.trim(); if (!line) continue;
+    const h = line.match(/^#{1,6}\s+(.*)$/);
+    if (h) {
+      const title = h[1].trim();
+      const num = (title.match(/^Module\s+(\d+)/i) || [])[1];
+      cur = { num: num ? Number(num) : null, rawTitle: title,
+        title: title.replace(/^Module\s+\d+\s*[\u2014\u2013-]\s*/i, ''), topics: [] };
+      mods.push(cur); continue;
+    }
+    if (!cur) continue;
+    const b = line.match(/^[-*\u2022]\s+(.+)$/);
+    if (b) cur.topics.push(b[1].trim());
+  }
+  if (!mods.length) {
+    const lines = raw.split(/\r?\n/).map(x => x.replace(/^[-*\u2022]\s+/, '').trim()).filter(Boolean);
+    if (lines.length) return [{ num:null, rawTitle:'Syllabus', title:'Syllabus', topics:lines }];
+  }
+  return mods.filter(m => m.topics.length);
+}
+
+function planKind(s){
+  const t = String(s.label || '');
+  if (s.module === 'Add-on sessions' || /LinkedIn|freelanc|MAANG|Resume Building|Communication Skills/i.test(t)) return 'career';
+  if (/memes/i.test(t)) return 'light';
+  if (/interview|questions|scenario|prep|mock/i.test(t) || (/handbook/i.test(t) && !/visual/i.test(t))) return 'interview';
+  if (/project|weekend-task|^task$|pipeline for/i.test(t)) return 'practice';
+  if (/^SESSION-\d+/i.test(t) || /^live class/i.test(t)) return 'learn';
+  if (s.module !== 'Notes' && /^(docker|git|linux)\s+class/i.test(t)) return 'learn';
+  return 'reference';
+}
+function kindLabel(k){
+  return ({ learn:'Learn', reference:'Reference', practice:'Build', interview:'Interview', career:'Career', light:'Break' })[k] || 'Study';
+}
+function planMinutes(s){
+  const k = planKind(s), t = String(s.label || '');
+  if (k === 'learn') {
+    if (/interaction|live class/i.test(t)) return 45;
+    if (/project/i.test(t)) return 120;
+    return 90;
+  }
+  if (k === 'practice') return /project/i.test(t) ? 120 : 60;
+  if (k === 'interview') return 45;
+  if (k === 'career') return 60;
+  if (k === 'light') return 5;
+  if (/full notes|handbook|cheat sheet|guide/i.test(t)) return 45;
+  if (/install|commands|jenkinsfile|dockerfile|manifest|compose|class-\d/i.test(t)) return 20;
+  return 30;
+}
+function planSourceItems(c){
+  if (isItemCourse(c)) return c.sessions.map(s => ({ ...s }));
+  const mods = parseSyllabus(c.scope);
+  const flat = [];
+  mods.forEach((m, mi) => m.topics.forEach((t, ti) => flat.push({
+    id: 't' + mi + '_' + ti, label: t, module: m.title || ('Module ' + (mi + 1)), done: false
+  })));
+  const pct = Math.max(0, Math.min(100, c.progress || 0));
+  const n = Math.round(flat.length * pct / 100);
+  flat.forEach((s, i) => { s.done = i < n; });
+  return flat;
+}
+function planStages(c, items){
+  if (!isItemCourse(c)) {
+    const names = [...new Set(items.map(s => s.module))];
+    return names.map((name, i) => ({
+      key: 'm' + i, title: name,
+      why: 'Syllabus module ' + (i + 1) + ' — study in brochure order.',
+      checkpoint: 'Explain ' + name + ' back in three minutes without notes.',
+      items: items.filter(s => s.module === name)
+    }));
+  }
+  const used = new Set();
+  const stages = PLAN_STAGES.map(def => {
+    const own = items.filter(s => def.modules.includes(s.module));
+    const notes = def.noteMatch ? items.filter(s => s.module === 'Notes' && def.noteMatch.test(s.label)) : [];
+    own.concat(notes).forEach(s => used.add(s.id));
+    return { ...def, items: [...own, ...notes] };
+  });
+  const rest = items.filter(s => !used.has(s.id));
+  if (rest.length) stages.push({
+    key: 'more', title: 'Remaining portal items',
+    why: 'Items that do not belong to a named module.',
+    checkpoint: 'Close these out to reach 100% on the portal.',
+    items: rest
+  });
+  return stages.filter(st => st.items.length);
+}
+function planWeeks(remaining, hours, stages, route){
+  const cap = Math.max(60, Math.round(hours * 60));
+  const doneIds = new Set(route.filter(x => x.done).map(x => x.id));
+  const completed = new Set(stages.filter(st => st.items.every(x => x.done)).map(st => st.key));
+  const weeks = [];
+  let cur = { items: [], min: 0 };
+  const push = () => {
+    if (!cur.items.length) return;
+    const reached = stages.filter(st => st.items.every(x => doneIds.has(x.id)) && !completed.has(st.key));
+    reached.forEach(st => completed.add(st.key));
+    cur.milestones = reached;
+    weeks.push(cur);
+    cur = { items: [], min: 0 };
+  };
+  for (const it of remaining) {
+    if (cur.items.length && cur.min + it.min > cap) push();
+    cur.items.push(it); cur.min += it.min; doneIds.add(it.id);
+    if (cur.min >= cap) push();
+  }
+  push();
+  return weeks;
+}
+function buildGapPlan(c){
+  if (!isItemCourse(c)) return null;
+  const mods = parseSyllabus(c.scope);
+  if (!mods.length) return null;
+  const out = [];
+  for (const m of mods) {
+    if (!m.num) continue;
+    const cov = SYLLABUS_COVERAGE[m.num] || { status:'self-check', by:'Not mapped to a portal item', gap:[], why:'', checkpoint:'' };
+    const missing = cov.status === 'missing' ? m.topics.slice() : (cov.status === 'partial' ? cov.gap.slice() : []);
+    const minutes = cov.status === 'missing' ? m.topics.length * 50 : (cov.status === 'partial' ? missing.length * 45 : 0);
+    out.push({ ...m, status: cov.status, by: cov.by, why: cov.why, checkpoint: cov.checkpoint, missing, minutes });
+  }
+  return {
+    modules: out,
+    minutes: out.reduce((a, x) => a + x.minutes, 0),
+    missing: out.filter(x => x.status === 'missing').length,
+    partial: out.filter(x => x.status === 'partial').length,
+    covered: out.filter(x => x.status === 'covered').length
+  };
+}
+function planHoursFor(c){
+  const s = st(c.id);
+  if (s.planHours) return s.planHours;
+  let v = 10;
+  try { const raw = Number(localStorage.getItem('ct-plan-hours')); if (raw >= 2 && raw <= 60) v = raw; } catch (e) {}
+  s.planHours = v; return v;
+}
+function buildPlan(c){
+  const items = planSourceItems(c);
+  const defs = planStages(c, items);
+  let step = 0;
+  const stages = defs.map(def => {
+    const list = def.items.map(s => {
+      step++;
+      const kind = planKind(s);
+      return { ...s, step, kind, min: planMinutes(s), stageKey: def.key, stageTitle: def.title };
+    });
+    return {
+      ...def, items: list, total: list.length,
+      done: list.filter(x => x.done).length,
+      minutes: list.reduce((a, x) => a + x.min, 0),
+      remainingMinutes: list.filter(x => !x.done).reduce((a, x) => a + x.min, 0),
+      next: list.find(x => !x.done) || null
+    };
+  });
+  const route = stages.flatMap(st => st.items);
+  const remaining = route.filter(x => !x.done);
+  const hours = planHoursFor(c);
+  const weekPlan = planWeeks(remaining, hours, stages, route);
+  const totalMinutes = remaining.reduce((a, x) => a + x.min, 0);
+  const gap = buildGapPlan(c);
+  const fullMinutes = totalMinutes + (gap ? gap.minutes : 0);
+  const fullWeeks = Math.max(weekPlan.length, Math.ceil(fullMinutes / Math.max(60, hours * 60)));
+  return {
+    course: c, stages, route, remaining, totalMinutes, hours,
+    weeks: weekPlan, weekCount: weekPlan.length, next: remaining[0] || null,
+    gap, fullMinutes, fullWeeks,
+    finish: new Date(Date.now() + weekPlan.length * 7 * 86400000),
+    fullFinish: new Date(Date.now() + fullWeeks * 7 * 86400000)
+  };
 }
 async function train(id){
   const c = courses.find(x=>x.id===id); if(!c) return;
@@ -736,6 +1290,9 @@ async function pick(k){
 document.addEventListener('click', async e=>{
   const b = e.target.closest('button'); if(!b) return; const d=b.dataset;
   if (d.open) openCourse(d.open);
+  else if (d.plan) togglePlan(d.plan);
+  else if (d.planclose) { const c = courses.find(x => x.id === selected); if (c) { setPlanOpen(c, false); render(); } }
+  else if (d.plancopy !== undefined) copyPlan();
   else if (d.train) train(d.train);
   else if (d.quiz){ startQuiz(d.quiz); }
   else if (d.finish) finish(d.finish);
@@ -784,6 +1341,14 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target;
+  if (t.id === 'planHours') {
+    const c = courses.find(x => x.id === selected);
+    if (!c) return;
+    st(c.id).planHours = Math.max(2, Math.min(60, Number(t.value) || 10));
+    try { localStorage.setItem('ct-plan-hours', String(st(c.id).planHours)); } catch (err) {}
+    render();
+    return;
+  }
   if (t.id === 'progRange') {
     const c = courses.find(x => x.id === selected);
     if (!c) return;

@@ -105,6 +105,37 @@ The DevOps course is tracked against the **portal item list**, not a guessed fig
 - Courses without an item list (any course you add yourself) still get the **Progress** slider
   in the desk header instead.
 
+## Perfect planning
+
+**Perfect planning** appears in the desk header and as **Perfect plan** in each table row. It is a
+deterministic route map, generated from three local sources and the current ticks:
+
+- the brochure syllabus (`devops-syllabus.txt`) - what the full 14-module course promises;
+- the 131 portal items (`devops-sessions.json`) - the exact steps and what counts as 100%;
+- your current marks - which steps are already done.
+
+What the panel gives you:
+
+- **Exact route**: every portal item numbered once in dependency order (cloud -> Linux -> Git ->
+  Jenkins -> Docker -> Kubernetes -> career). Notes are moved next to the module they revise.
+- **Next exact step**: the first unticked item, with its module, type and study estimate.
+- **Pace and projection**: choose 5/8/10/15/20/25 hours per week; the week-by-week route and finish
+  date are recomputed. The pace is stored in `localStorage` (`ct-plan-hours`).
+- **Week-by-week route**: every remaining step placed into a week, with a recall drill and a
+  pass/fail milestone when a stage finishes.
+- **Full-syllabus gap map**: the portal stops at Session 63, so the brochure's unrecorded and partly
+  covered modules (Azure, Terraform, AWS depth, MCP, Ansible/New Relic, security tools, Linux depth,
+  Kubernetes depth) are listed with their exact missing topics, study hours and a checkpoint. This
+  is the difference between ticking 131 items and being interview-ready.
+- **Best-results protocol**: the learn -> do -> recall -> space loop, day 1/3/7/21 reviews, portfolio
+  artifacts, mock-interview cadence, and the minimum viable lane when time is short.
+- **Copy route map**: copies the whole plan as plain text (the full route, weeks, gaps and sources).
+
+Estimates are study heuristics, not video lengths: 90 min per recorded class, 45 min for
+interaction/live sessions, 60-120 min for builds, 45 min for interview material, 20-45 min for
+reference notes. Courses without a portal list get a syllabus-based route, with the first
+`progress%` of topics treated as covered (the same model as **Train**).
+
 ## Loaded course
 
 - **DevOps with Multi Cloud (AWS + Azure)** - Frontlines Edutech
