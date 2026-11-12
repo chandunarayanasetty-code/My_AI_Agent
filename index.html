@@ -667,7 +667,7 @@ function planItemHtml(x, next){
   const isNext = next && x.step === next.step;
   return `<div class="planitem${x.done ? ' done' : ''}${isNext ? ' next' : ''}">
     <span class="stepno">${x.step}</span>
-    <span class="plabel">${esc(x.label)}</span>
+    <span class="plabel">${esc(x.label)}${x.dup ? ' <span class="small">(duplicate \u2014 skim for differences)</span>' : ''}</span>
     <span class="meta"><span class="kbadge ${x.kind}">${kindLabel(x.kind)}</span><span>${x.min} min</span>${x.done ? '<span>done</span>' : ''}</span>
   </div>`;
 }
@@ -678,8 +678,11 @@ function planHtml(c){
       <div class="small">This course has no portal item list and no syllabus scope. Add the syllabus with <b>Edit scope</b> (or paste the portal list) and the route will be generated from it.</div></div>
       <div class="actions"><button class="ghost" data-planclose="1">Hide</button></div></div></section>`;
   const next = p.next;
+  const marked = isItemCourse(c) ? markedItems(c).length : 0;
   const trainHint = isItemCourse(c)
-    ? `If it is already ticked, use <b>Train marked (${markedItems(c).length})</b> to revise only your ticks.`
+    ? (marked
+        ? `If it is already ticked, use <b>Train marked (${marked})</b> to revise only your ticks.`
+        : `After you tick it, <b>Train</b> will revise only the ticked items.`)
     : `Use <b>Train ${Math.round(c.progress || 0)}% \u2192 100%</b> to study the next block.`;
   let h = `<section class="panel plan" id="planPanel">
     <div class="planhead"><div><div class="tag">Perfect planning</div>
@@ -730,7 +733,7 @@ function planHtml(c){
 function planWeeksHtml(p){
   if (!p.weeks.length) return `<div class="sec"><h3>Week-by-week route</h3><div class="small">Nothing left in the portal route. Use the gap map below, then revise with Train marked.</div></div>`;
   let h = `<div class="sec"><h3>Week-by-week route</h3>
-    <div class="small">${p.weeks.length} week${p.weeks.length === 1 ? '' : 's'} at ${p.hours} h/week. Each week is capped at your pace; one long project may spill into the next week. Checkpoints are pass/fail: if you cannot do the checkpoint, repeat the week's recall drill before moving on.</div>`;
+    <div class="small">${p.weeks.length} week${p.weeks.length === 1 ? '' : 's'} at ${p.hours} h/week. Each week is capped at your pace; a long project moves to the next week, so an earlier week can leave spare review time. Checkpoints are pass/fail: if you cannot do the checkpoint, repeat the week's recall drill before moving on.</div>`;
   p.weeks.forEach((w, i) => {
     const stages = [...new Set(w.items.map(x => x.stageTitle))];
     const focus = stages.slice(0, 2).join(' \u2192 ') + (stages.length > 2 ? ' +' + (stages.length - 2) : '');
@@ -777,7 +780,7 @@ function planGapHtml(p){
     h += `<details class="hl planblock"${i === firstMissing ? ' open' : ''}><summary>${esc(m.rawTitle)} \u00b7 <span class="kbadge ${badge}">${statusText}</span> \u00b7 ${fmtMin(m.minutes)}</summary>
       <div class="small" style="margin-top:6px"><b>Portal basis:</b> ${esc(m.by)}</div>
       <div class="small">${esc(m.why)}</div>
-      <div class="small" style="margin-top:8px"><b>${m.status === 'missing' ? 'Exact study order' : 'Missing topics to add'}:</b></div>
+      <div class="small" style="margin-top:8px"><b>${m.status === 'missing' ? 'Exact study order' : 'Not explicitly recorded \u2014 add or verify'}:</b></div>
       <ol class="topics">${m.missing.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
       <div class="gapnote"><b>Checkpoint:</b> ${esc(m.checkpoint)}</div>
     </details>`;
@@ -789,6 +792,10 @@ function planGapHtml(p){
 }
 function planProtocolHtml(p){
   const c = p.course;
+  const marked = isItemCourse(c) ? markedItems(c).length : 0;
+  const trainUse = isItemCourse(c)
+    ? (marked ? `<b>Train marked (${marked})</b> for a revision pass` : `<b>Train</b> becomes available after the first tick`)
+    : `<b>Train ${Math.round(c.progress || 0)}% \u2192 100%</b> for the next block`;
   return `<details class="hl planblock" open><summary><b>Best-results protocol</b> \u00b7 how to study each step</summary>
     <div class="small" style="margin-top:8px">The route is only half the result. This loop is what turns watched sessions into recall you can use in an interview.</div>
     <ol class="topics">
@@ -799,10 +806,11 @@ function planProtocolHtml(p){
       <li><b>Space (10/10/20/20 min):</b> review the summary the next day, day 3, day 7 and day 21. This is the highest-yield habit in the plan.</li>
     </ol>
     <div class="small"><b>Portfolio artifacts from the portal:</b> Docker Project 1 (Java), Docker Project 2 (Python) and the Docker webapp pipeline become three repo READMEs; the Kubernetes scenarios become a GitOps repo with ArgoCD, probes and ingress. Link them from your resume.</div>
+    <div class="small"><b>Result you can claim:</b> 131/131 portal items, 14/14 brochure modules, three portfolio repos, the interview banks worked through, one mock per week, and the certificate requested after the final project.</div>
     <div class="small"><b>Interview cadence:</b> after Docker, use SESSION-45 plus the Jenkins/Docker handbooks for one mock per week. After Kubernetes, add the senior scenario file and the MAANG session. Record each answer, then rewrite the weak ones.</div>
     <div class="small"><b>Tick rule:</b> tick an item only when you can do its checkpoint or explain it without notes. If you cannot, leave it unticked; Train marked will keep it in revision.</div>
     <div class="small"><b>If time is short:</b> do the Learn items in Cloud, Linux, Git, Jenkins, Docker and Kubernetes first, plus the two Docker projects and one interview handbook. That is the minimum viable mastery lane, not 100% portal completion, but it protects the interview result.</div>
-    <div class="small"><b>Use the app:</b> tick as you finish, then press <b>Train marked (${isItemCourse(c) ? markedItems(c).length : Math.round(c.progress || 0)})</b> for a revision pass; <b>Clear module</b> when a module no longer needs revision.</div>
+    <div class="small"><b>Use the app:</b> tick as you finish, then press ${trainUse}; <b>Clear module</b> when a module no longer needs revision.</div>
   </details>`;
 }
 function planSourcesHtml(p){
@@ -850,7 +858,7 @@ function planText(c){
   lines.push('FULL ROUTE MAP');
   p.stages.forEach((st, i) => {
     lines.push(`\n${i + 1}. ${st.title} (${st.done}/${st.total}, ${fmtHours(st.minutes)})`);
-    st.items.forEach(x => lines.push(`${x.step}. [${x.done ? 'x' : ' '}] ${x.label} \u2014 ${kindLabel(x.kind)}, ${x.min} min`));
+    st.items.forEach(x => lines.push(`${x.step}. [${x.done ? 'x' : ' '}] ${x.label}${x.dup ? ' [duplicate - skim]' : ''} \u2014 ${kindLabel(x.kind)}, ${x.min} min`));
     lines.push('  Checkpoint: ' + st.checkpoint);
   });
   if (p.gap) {
@@ -1185,13 +1193,21 @@ function planHoursFor(c){
 }
 function buildPlan(c){
   const items = planSourceItems(c);
+  const seenLabels = new Map();
+  const dupIds = new Set();
+  for (const s of items) {
+    const key = String(s.label || '').toLowerCase().replace(/\(\d+\)\s*$/, '').replace(/\s+/g, ' ').trim();
+    if (!key) continue;
+    if (seenLabels.has(key)) dupIds.add(s.id); else seenLabels.set(key, s);
+  }
   const defs = planStages(c, items);
   let step = 0;
   const stages = defs.map(def => {
     const list = def.items.map(s => {
       step++;
-      const kind = planKind(s);
-      return { ...s, step, kind, min: planMinutes(s), stageKey: def.key, stageTitle: def.title };
+      const dup = dupIds.has(s.id);
+      const kind = dup ? 'reference' : planKind(s);
+      return { ...s, step, kind, min: dup ? 10 : planMinutes(s), dup, stageKey: def.key, stageTitle: def.title };
     });
     return {
       ...def, items: list, total: list.length,
