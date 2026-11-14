@@ -10,6 +10,7 @@ fs.mkdirSync(out, { recursive: true });
 const files = [
   'index.html',
   'devops-sessions.json',
+  'sql-sessions.json',
   'devops-syllabus.txt',
   'portal-course-list.txt',
   'README.md'

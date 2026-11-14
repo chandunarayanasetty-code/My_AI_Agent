@@ -610,8 +610,11 @@ function sessionsView(c){
     if (!m) { m = { name: s.module, items: [] }; mods.push(m); }
     m.items.push(s);
   }
-  let h = `<div class="sec sessions"><h3>Portal progress</h3>
-    <div class="small">${done} of ${list.length} items done · ${pct}% · QA sessions excluded</div>
+  const dev = isDevOpsCourse(c);
+  const totalMin = list.reduce((a, s) => a + (s.minutes || 0), 0);
+  const leftMin = list.filter(s => !s.done).reduce((a, s) => a + (s.minutes || 0), 0);
+  let h = `<div class="sec sessions"><h3>${dev ? 'Portal progress' : 'Course progress'}</h3>
+    <div class="small">${done} of ${list.length} items done · ${pct}%${totalMin ? ` · ${fmtMin(totalMin)} of video${leftMin ? ` · ${fmtMin(leftMin)} left` : ''}` : ''} · QA sessions excluded</div>
     <div class="bar"><i style="width:${pct}%"></i></div>`;
   for (const m of mods) {
     const md = m.items.filter(s => s.done).length;
@@ -622,7 +625,7 @@ function sessionsView(c){
       <summary>${esc(m.name)} &#183; ${md}/${m.items.length}</summary>
       <div class="sesslist">`;
     for (const s of m.items) {
-      h += `<label class="sess"><input type="checkbox" data-sess="${esc(s.id)}"${s.done ? ' checked' : ''}><span>${esc(s.label)}</span></label>`;
+      h += `<label class="sess"><input type="checkbox" data-sess="${esc(s.id)}"${s.done ? ' checked' : ''}><span>${esc(s.label)}${s.minutes ? ` <span class="small">\u00b7 ${s.minutes} min</span>` : ''}</span></label>`;
     }
     const confirming = md === m.items.length && ui.clear === m.name;
     h += `</div><div class="actions">` + (md === m.items.length
@@ -675,9 +678,12 @@ function planHtml(c){
   const p = buildPlan(c);
   if (!p.route.length) return `<section class="panel plan" id="planPanel">
     <div class="planhead"><div><div class="tag">Perfect planning</div><h2>No route yet</h2>
-      <div class="small">This course has no portal item list and no syllabus scope. Add the syllabus with <b>Edit scope</b> (or paste the portal list) and the route will be generated from it.</div></div>
+      <div class="small">This course has no item list and no syllabus scope. Add the syllabus with <b>Edit scope</b> (or add the item list) and the route will be generated from it.</div></div>
       <div class="actions"><button class="ghost" data-planclose="1">Hide</button></div></div></section>`;
   const next = p.next;
+  const dev = isDevOpsCourse(c);
+  const hasDurations = p.route.some(x => x.minutes);
+  const progressWord = dev ? 'Portal progress' : 'Course progress';
   const marked = isItemCourse(c) ? markedItems(c).length : 0;
   const trainHint = isItemCourse(c)
     ? (marked
@@ -687,31 +693,35 @@ function planHtml(c){
   let h = `<section class="panel plan" id="planPanel">
     <div class="planhead"><div><div class="tag">Perfect planning</div>
       <h2>Exact route to finish ${esc(c.name)}</h2>
-      <div class="small">Built from the brochure, the ${p.route.length}-item portal list, your ticks, notes, project briefs, interview banks and official docs. Times are study estimates, not video lengths.</div></div>
+      <div class="small">Built from the course scope, the ${p.route.length}-item list, your ticks${hasDurations ? ', the portal durations' : ''} and the reference set. Times are study estimates${hasDurations ? ' (video duration plus 50% hands-on)' : ''}, not video lengths.</div></div>
       <div class="actions"><button data-plancopy="1">Copy route map</button><button class="ghost" data-planclose="1">Hide</button></div></div>
     <div class="planstats">
       <div class="stat"><b>${p.remaining.length}</b><span>steps left / ${p.route.length}</span></div>
       <div class="stat"><b>${fmtMin(p.totalMinutes)}</b><span>study time left</span></div>
       <div class="stat"><b>${p.weekCount}</b><span>weeks at ${p.hours} h/week</span></div>
-      <div class="stat"><b>${Math.round(c.progress || 0)}%</b><span>${isItemCourse(c) ? 'portal completion' : 'course progress'}</span></div>
+      <div class="stat"><b>${Math.round(c.progress || 0)}%</b><span>${isItemCourse(c) ? (dev ? 'portal completion' : 'course completion') : 'course progress'}</span></div>
       ${p.gap ? `<div class="stat"><b>${fmtHours(p.fullMinutes)}</b><span>full-syllabus time</span></div>` : ''}
     </div>`;
   if (p.gap) h += `<div class="small">Full-syllabus mastery adds about ${fmtMin(p.gap.minutes)} for ${p.gap.missing} unrecorded and ${p.gap.partial} partly covered brochure modules, about ${p.fullWeeks} weeks all-in at this pace. The portal can reach 100% sooner; the gap map is what makes the result interview-ready.</div>`;
   if (next) {
     const after = p.remaining.slice(1, 4).map(x => esc(x.label)).join(' \u2192 ');
+    const nextMeta = (next.minutes ? next.minutes + ' min video \u00b7 ' : '') + next.min + ' min study';
     h += `<div class="nextup"><div class="small">Next exact step \u00b7 ${next.step} of ${p.route.length} \u00b7 ${esc(next.module)}</div>
-      <div class="nextrow"><span class="stepno">${next.step}</span><b>${esc(next.label)}</b><span class="kbadge ${next.kind}">${kindLabel(next.kind)}</span><span class="small">${next.min} min</span></div>
+      <div class="nextrow"><span class="stepno">${next.step}</span><b>${esc(next.label)}</b><span class="kbadge ${next.kind}">${kindLabel(next.kind)}</span><span class="small">${nextMeta}</span></div>
       ${after ? `<div class="small">Then: ${after}${p.remaining.length > 4 ? ' \u2192 \u2026' : ''}</div>` : ''}
-      <div class="small">Do it, then tick it in Portal progress. ${trainHint}</div></div>`;
+      <div class="small">Do it, then tick it in ${progressWord}. ${trainHint}</div></div>`;
   } else {
-    h += `<div class="nextup"><b>Portal route complete.</b><div class="small">All ${p.route.length} items are ticked. Move to the full-syllabus gap map, then run mock interviews and publish the portfolio.</div></div>`;
+    h += `<div class="nextup"><b>Route complete.</b><div class="small">All ${p.route.length} items are ticked. ${p.gap ? 'Move to the full-syllabus gap map, then run mock interviews and publish the portfolio.' : 'Move to the portfolio and mock-interview steps in the protocol below.'}</div></div>`;
   }
   h += `<div class="planpace"><label for="planHours">Study pace</label>
     <select id="planHours">${[5, 8, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60].map(v => `<option value="${v}"${v === p.hours ? ' selected' : ''}>${v} h per week</option>`).join('')}</select>
-    <span class="small">~${p.weekCount} week${p.weekCount === 1 ? '' : 's'} \u00b7 portal finish around <b>${fmtDate(p.finish)}</b>${p.gap ? ` \u00b7 full syllabus around <b>${fmtDate(p.fullFinish)}</b>` : ''}</span>
+    <span class="small">~${p.weekCount} week${p.weekCount === 1 ? '' : 's'} \u00b7 ${dev ? 'portal' : 'course'} finish around <b>${fmtDate(p.finish)}</b>${p.gap ? ` \u00b7 full syllabus around <b>${fmtDate(p.fullFinish)}</b>` : ''}</span>
     <span class="small" id="planMsg"></span></div>`;
+  const orderText = dev
+    ? 'The order is dependency-driven, not portal order: Linux before Git, Jenkins, Docker and Kubernetes; Git before CI; CI before Docker delivery; Docker before Kubernetes; cloud before everything.'
+    : `The order follows the course sequence: ${p.stages.map(s => esc(s.title)).join(' \u2192 ')}. Later modules assume the earlier query basics.`;
   h += `<div class="sec"><h3>Critical path</h3>
-    <div class="small">The order is dependency-driven, not portal order: Linux before Git, Jenkins, Docker and Kubernetes; Git before CI; CI before Docker delivery; Docker before Kubernetes; cloud before everything.</div>
+    <div class="small">${orderText}</div>
     <div class="stagerail">`;
   p.stages.forEach((stage, i) => {
     const pct = stage.total ? Math.round(stage.done / stage.total * 100) : 0;
@@ -731,7 +741,7 @@ function planHtml(c){
   return h + '</section>';
 }
 function planWeeksHtml(p){
-  if (!p.weeks.length) return `<div class="sec"><h3>Week-by-week route</h3><div class="small">Nothing left in the portal route. Use the gap map below, then revise with Train marked.</div></div>`;
+  if (!p.weeks.length) return `<div class="sec"><h3>Week-by-week route</h3><div class="small">Nothing left in the course route. Use the portfolio and mock-interview steps, then revise with Train marked.</div></div>`;
   let h = `<div class="sec"><h3>Week-by-week route</h3>
     <div class="small">${p.weeks.length} week${p.weeks.length === 1 ? '' : 's'} at ${p.hours} h/week. Each week is capped at your pace; a long project moves to the next week, so an earlier week can leave spare review time. Checkpoints are pass/fail: if you cannot do the checkpoint, repeat the week's recall drill before moving on.</div>`;
   p.weeks.forEach((w, i) => {
@@ -751,7 +761,7 @@ function planWeeksHtml(p){
 }
 function planRouteHtml(p){
   let h = `<details class="hl planblock"><summary><b>Full route map</b> \u00b7 ${p.route.length} exact steps \u00b7 ${p.remaining.length} left</summary>
-    <div class="small" style="margin:6px 0 10px">Steps are numbered once, in dependency order. Notes are moved next to the module they revise; career items close the route. Done items stay visible so you can see the whole map.</div>`;
+    <div class="small" style="margin:6px 0 10px">Steps are numbered once, in course order. Reference and revision items are moved next to the module they revise. Done items stay visible so you can see the whole map.</div>`;
   p.stages.forEach((stage, i) => {
     const active = p.next && stage.key === p.next.stageKey;
     h += `<details class="hl"${active ? ' open' : ''}><summary>${i + 1}. ${esc(stage.title)} \u00b7 ${stage.done}/${stage.total} done \u00b7 ${fmtHours(stage.minutes)}</summary>
@@ -792,29 +802,66 @@ function planGapHtml(p){
 }
 function planProtocolHtml(p){
   const c = p.course;
+  const dev = isDevOpsCourse(c);
   const marked = isItemCourse(c) ? markedItems(c).length : 0;
   const trainUse = isItemCourse(c)
     ? (marked ? `<b>Train marked (${marked})</b> for a revision pass` : `<b>Train</b> becomes available after the first tick`)
     : `<b>Train ${Math.round(c.progress || 0)}% \u2192 100%</b> for the next block`;
+  const doStep = dev
+    ? '<b>Do (30 min):</b> repeat the commands or manifest on your own EC2 box; break it once and fix it.'
+    : '<b>Do (30 min):</b> type every query yourself on the practice database and break it once (wrong join, NULL filter) so you see the failure.';
+  const portfolio = dev
+    ? 'Docker Project 1 (Java), Docker Project 2 (Python) and the Docker webapp pipeline become three repo READMEs; the Kubernetes scenarios become a GitOps repo with ArgoCD, probes and ingress. Link them from your resume.'
+    : 'Keep one SQL portfolio repo with a folder per module: schema DDL, the practice queries, and a short README explaining the business question and the result. Add one Snowflake worksheet that shows a window function, LISTAGG and a pivoted report. Link it from your resume.';
+  const result = dev
+    ? '131/131 portal items, 14/14 brochure modules, three portfolio repos, the interview banks worked through, one mock per week, and the certificate requested after the final project.'
+    : `${p.route.length}/${p.route.length} course items, ${p.stages.length}/${p.stages.length} modules, one query portfolio repo, a set of analytics queries you can explain line by line, and one SQL mock interview per week.`;
+  const cadence = dev
+    ? 'after Docker, use SESSION-45 plus the Jenkins/Docker handbooks for one mock per week. After Kubernetes, add the senior scenario file and the MAANG session. Record each answer, then rewrite the weak ones.'
+    : 'after Joins & Set Operators, work one easy/medium SQL interview question per day; after Window Functions and CTEs, move to medium/hard questions and explain the execution plan for each. Record your spoken answer, then rewrite the weak ones.';
+  const short = dev
+    ? 'do the Learn items in Cloud, Linux, Git, Jenkins, Docker and Kubernetes first, plus the two Docker projects and one interview handbook. That is the minimum viable mastery lane, not 100% portal completion, but it protects the interview result.'
+    : 'do DDL/DML, WHERE/ORDER BY, joins and set operators, NULL handling, window functions and CTEs first, plus the practice sessions that go with them. That is the minimum interview lane even if the Snowflake and advanced-pattern items stay unticked.';
   return `<details class="hl planblock" open><summary><b>Best-results protocol</b> \u00b7 how to study each step</summary>
     <div class="small" style="margin-top:8px">The route is only half the result. This loop is what turns watched sessions into recall you can use in an interview.</div>
     <ol class="topics">
       <li><b>Preview (5 min):</b> read the item title and write two questions you expect it to answer.</li>
       <li><b>Learn (the item estimate):</b> watch or read once, without pausing to copy slides.</li>
-      <li><b>Do (30 min):</b> repeat the commands or manifest on your own EC2 box; break it once and fix it.</li>
+      <li>${doStep}</li>
       <li><b>Recall (10 min):</b> close everything and explain it aloud, then write a five-line summary from memory.</li>
       <li><b>Space (10/10/20/20 min):</b> review the summary the next day, day 3, day 7 and day 21. This is the highest-yield habit in the plan.</li>
     </ol>
-    <div class="small"><b>Portfolio artifacts from the portal:</b> Docker Project 1 (Java), Docker Project 2 (Python) and the Docker webapp pipeline become three repo READMEs; the Kubernetes scenarios become a GitOps repo with ArgoCD, probes and ingress. Link them from your resume.</div>
-    <div class="small"><b>Result you can claim:</b> 131/131 portal items, 14/14 brochure modules, three portfolio repos, the interview banks worked through, one mock per week, and the certificate requested after the final project.</div>
-    <div class="small"><b>Interview cadence:</b> after Docker, use SESSION-45 plus the Jenkins/Docker handbooks for one mock per week. After Kubernetes, add the senior scenario file and the MAANG session. Record each answer, then rewrite the weak ones.</div>
+    <div class="small"><b>Portfolio artifacts from the course:</b> ${portfolio}</div>
+    <div class="small"><b>Result you can claim:</b> ${result}</div>
+    <div class="small"><b>Interview cadence:</b> ${cadence}</div>
     <div class="small"><b>Tick rule:</b> tick an item only when you can do its checkpoint or explain it without notes. If you cannot, leave it unticked; Train marked will keep it in revision.</div>
-    <div class="small"><b>If time is short:</b> do the Learn items in Cloud, Linux, Git, Jenkins, Docker and Kubernetes first, plus the two Docker projects and one interview handbook. That is the minimum viable mastery lane, not 100% portal completion, but it protects the interview result.</div>
+    <div class="small"><b>If time is short:</b> ${short}</div>
     <div class="small"><b>Use the app:</b> tick as you finish, then press ${trainUse}; <b>Clear module</b> when a module no longer needs revision.</div>
   </details>`;
 }
 function planSourcesHtml(p){
+  const c = p.course;
+  const dev = isDevOpsCourse(c);
   const count = k => p.route.filter(x => x.kind === k).length;
+  if (!dev) {
+    const modCount = p.stages.length;
+    return `<details class="hl planblock"><summary><b>References used</b> \u00b7 local sources and official docs</summary>
+    <div class="small" style="margin-top:8px"><b>Local sources</b></div>
+    <ul class="topics">
+      <li><b>Course item list</b> \u2014 ${p.route.length} items in ${modCount} modules with the portal video duration for each; defines completion, the exact step order and the study-time estimates.</li>
+      <li><b>Practice items</b> \u2014 ${count('practice')} practice sessions and hands-on exercises; used as portfolio evidence.</li>
+      <li><b>Reference items</b> \u2014 ${count('reference')} resource, setup and revision items; used as support, not as first-pass teaching.</li>
+    </ul>
+    <div class="small"><b>Official docs</b></div>
+    <ul class="topics">
+      <li><a href="https://www.postgresql.org/docs/" target="_blank" rel="noopener">PostgreSQL documentation</a> \u00b7 <a href="https://www.postgresql.org/docs/current/functions-window.html" target="_blank" rel="noopener">window functions</a> \u00b7 <a href="https://www.postgresql.org/docs/current/queries-with.html" target="_blank" rel="noopener">CTEs</a></li>
+      <li><a href="https://docs.snowflake.com/" target="_blank" rel="noopener">Snowflake documentation</a> \u00b7 <a href="https://docs.snowflake.com/en/sql-reference/functions-list" target="_blank" rel="noopener">SQL function reference</a> \u00b7 <a href="https://docs.snowflake.com/en/sql-reference/constructs/pivot" target="_blank" rel="noopener">PIVOT / UNPIVOT</a></li>
+      <li><a href="https://www.postgresql.org/docs/current/sql-explain.html" target="_blank" rel="noopener">EXPLAIN and performance tuning</a> \u00b7 <a href="https://www.postgresql.org/docs/current/sql-grant.html" target="_blank" rel="noopener">GRANT / access control</a></li>
+    </ul>
+    <div class="small"><b>Study method</b>: active recall and spaced repetition (Roediger &amp; Karpicke, 2006; Dunlosky et al., 2013) plus query-writing practice. The weekly recall drills and day 1/3/7/21 reviews apply those findings to this route.</div>
+    <div class="small"><b>Estimates</b>: each item is the portal video duration plus 50% hands-on (minimum 10 min). Adjust after week 1 using your actual pace.</div>
+  </details>`;
+  }
   return `<details class="hl planblock"><summary><b>References used</b> \u00b7 local sources and official docs</summary>
     <div class="small" style="margin-top:8px"><b>Local sources</b></div>
     <ul class="topics">
@@ -838,14 +885,16 @@ function planSourcesHtml(p){
 }
 function planText(c){
   const p = buildPlan(c);
+  const dev = isDevOpsCourse(c);
   const lines = [];
+  const progressWord = dev ? 'Portal' : 'Course';
   lines.push('PERFECT PLANNING \u2014 ' + c.name);
   lines.push('Generated ' + fmtDate(new Date()) + ' \u00b7 pace ' + p.hours + ' h/week');
-  lines.push(`Portal: ${p.route.length} steps, ${p.remaining.length} left, ${fmtMin(p.totalMinutes)} study time, about ${p.weekCount} weeks (finish around ${fmtDate(p.finish)}).`);
+  lines.push(`${progressWord}: ${p.route.length} steps, ${p.remaining.length} left, ${fmtMin(p.totalMinutes)} study time, about ${p.weekCount} weeks (finish around ${fmtDate(p.finish)}).`);
   if (p.gap) lines.push(`Full syllabus adds about ${fmtMin(p.gap.minutes)} for ${p.gap.missing} unrecorded and ${p.gap.partial} partly covered modules; about ${p.fullWeeks} weeks total.`);
   lines.push('');
-  if (p.next) lines.push(`NEXT: step ${p.next.step} \u2014 ${p.next.label} (${kindLabel(p.next.kind)}, ${p.next.min} min, ${p.next.module}).`);
-  else lines.push('NEXT: portal route complete. Move to the gap map and mock interviews.');
+  if (p.next) lines.push(`NEXT: step ${p.next.step} \u2014 ${p.next.label} (${kindLabel(p.next.kind)}, ${p.next.min} min${p.next.minutes ? `, ${p.next.minutes} min video` : ''}, ${p.next.module}).`);
+  else lines.push(`NEXT: ${progressWord.toLowerCase()} route complete. Move to the portfolio and mock-interview steps.`);
   lines.push('');
   lines.push('WEEK-BY-WEEK');
   p.weeks.forEach((w, i) => {
@@ -872,14 +921,22 @@ function planText(c){
   lines.push('\nBEST-RESULTS PROTOCOL');
   lines.push('1. Preview 5 min: write two questions the item should answer.');
   lines.push('2. Learn: watch/read once without copying slides.');
-  lines.push('3. Do 30 min: repeat the commands or manifest on your own EC2 box.');
+  lines.push(dev
+    ? '3. Do 30 min: repeat the commands or manifest on your own EC2 box.'
+    : '3. Do 30 min: type every query yourself on the practice database and break it once.');
   lines.push('4. Recall 10 min: close everything, explain aloud, write five lines from memory.');
   lines.push('5. Space: review day 1, day 3, day 7 and day 21.');
   lines.push('6. Tick only when you can explain it or pass the checkpoint.');
-  lines.push('7. Portfolio: Docker Project 1, Docker Project 2, the Docker webapp pipeline, and a Kubernetes GitOps repo.');
-  lines.push('8. Interviews: one mock per week after Docker; add senior scenarios and MAANG after Kubernetes.');
+  lines.push(dev
+    ? '7. Portfolio: Docker Project 1, Docker Project 2, the Docker webapp pipeline, and a Kubernetes GitOps repo.'
+    : '7. Portfolio: one SQL repo with DDL, module queries and READMEs, plus a Snowflake worksheet.');
+  lines.push(dev
+    ? '8. Interviews: one mock per week after Docker; add senior scenarios and MAANG after Kubernetes.'
+    : '8. Interviews: one SQL mock per week; move to medium/hard once window functions and CTEs are done.');
   lines.push('\nSOURCES');
-  lines.push('Brochure syllabus (14 modules), portal item list (recordings through Session 63), notes/reference items, project briefs, interview banks, add-on career sessions, official AWS/Azure/Kubernetes/Docker/Jenkins/Terraform/ArgoCD/Helm/Prometheus/Ansible/New Relic/Trivy/Istio/OWASP/MCP docs, and active-recall/spaced-repetition research.');
+  lines.push(dev
+    ? 'Brochure syllabus (14 modules), portal item list (recordings through Session 63), notes/reference items, project briefs, interview banks, add-on career sessions, official AWS/Azure/Kubernetes/Docker/Jenkins/Terraform/ArgoCD/Helm/Prometheus/Ansible/New Relic/Trivy/Istio/OWASP/MCP docs, and active-recall/spaced-repetition research.'
+    : 'Course item list (53 items, 7 modules, portal durations), practice and reference items, official PostgreSQL and Snowflake documentation, and active-recall/spaced-repetition research.');
   return lines.join('\n');
 }
 function renderDesk(){
@@ -1080,6 +1137,7 @@ function planKind(s){
   const t = String(s.label || '');
   if (s.module === 'Add-on sessions' || /LinkedIn|freelanc|MAANG|Resume Building|Communication Skills/i.test(t)) return 'career';
   if (/memes/i.test(t)) return 'light';
+  if (s.minutes) return /practice|project|exercise|task/i.test(t) ? 'practice' : 'learn';
   if (/interview|questions|scenario|prep|mock/i.test(t) || (/handbook/i.test(t) && !/visual/i.test(t))) return 'interview';
   if (/project|weekend-task|^task$|pipeline for/i.test(t)) return 'practice';
   if (/^SESSION-\d+/i.test(t) || /^live class/i.test(t)) return 'learn';
@@ -1090,6 +1148,7 @@ function kindLabel(k){
   return ({ learn:'Learn', reference:'Reference', practice:'Build', interview:'Interview', career:'Career', light:'Break' })[k] || 'Study';
 }
 function planMinutes(s){
+  if (s.minutes) return Math.max(10, Math.round(s.minutes * 1.5));
   const k = planKind(s), t = String(s.label || '');
   if (k === 'learn') {
     if (/interaction|live class/i.test(t)) return 45;
@@ -1121,7 +1180,7 @@ function planStages(c, items){
     const names = [...new Set(items.map(s => s.module))];
     return names.map((name, i) => ({
       key: 'm' + i, title: name,
-      why: 'Syllabus module ' + (i + 1) + ' — study in brochure order.',
+      why: 'Syllabus module ' + (i + 1) + ' — study in syllabus order.',
       checkpoint: 'Explain ' + name + ' back in three minutes without notes.',
       items: items.filter(s => s.module === name)
     }));
@@ -1134,11 +1193,22 @@ function planStages(c, items){
     return { ...def, items: [...own, ...notes] };
   });
   const rest = items.filter(s => !used.has(s.id));
-  if (rest.length) stages.push({
-    key: 'more', title: 'Remaining portal items',
-    why: 'Items that do not belong to a named module.',
-    checkpoint: 'Close these out to reach 100% on the portal.',
-    items: rest
+  const groups = [];
+  for (const s of rest) {
+    const name = s.module || 'Course items';
+    let g = groups.find(x => x.name === name);
+    if (!g) { g = { name, items: [] }; groups.push(g); }
+    g.items.push(s);
+  }
+  const filled = stages.filter(st => st.items.length).length;
+  groups.forEach((g, i) => {
+    const n = filled + i + 1;
+    stages.push({
+      key: 'custom-' + n, title: g.name,
+      why: 'Module ' + n + ' of this course \u2014 study in course order; each item builds on the previous one.',
+      checkpoint: 'Explain ' + g.name + ' and complete one hands-on exercise without notes.',
+      items: g.items
+    });
   });
   return stages.filter(st => st.items.length);
 }
@@ -1164,8 +1234,11 @@ function planWeeks(remaining, hours, stages, route){
   push();
   return weeks;
 }
+function isDevOpsCourse(c){
+  return /DevOps with Multi Cloud/i.test(c.name || '') || /Introduction to DevOps/i.test(c.scope || '');
+}
 function buildGapPlan(c){
-  if (!isItemCourse(c)) return null;
+  if (!isItemCourse(c) || !isDevOpsCourse(c)) return null;
   const mods = parseSyllabus(c.scope);
   if (!mods.length) return null;
   const out = [];
@@ -1239,7 +1312,7 @@ async function train(id){
   const s = st(id); s.busy='train'; s.err=null; openCourse(id);
   const b = blockRange(c);
   const { from, to } = b;
-  if (b.marked === 0){ s.busy=null; s.err='Tick at least one item in Portal progress, then train.'; render(); return; }
+  if (b.marked === 0){ s.busy=null; s.err='Tick at least one item in the course checklist, then train.'; render(); return; }
   const scope = scopeFor(c);
   const label = b.marked != null ? 'Revision of your ' + b.marked + ' marked item' + (b.marked === 1 ? '' : 's') : '';
   const earlier = (c.lessons||[]).length
@@ -1427,15 +1500,31 @@ $('addForm').addEventListener('submit', async e=>{
 });
 
 /* ---------- boot ---------- */
-/* First run in any browser: build the DevOps course from the bundled item list,
-   so a fresh origin (for example the Vercel site) is not an empty page. */
-async function seedIfEmpty(){
-  if (localStorage.getItem('ct-seeded-v1')) return;
+/* First run in any browser: build the bundled courses from the item lists,
+   so a fresh origin (for example the Vercel site) is not an empty page.
+   Each course has its own one-time guard, so a later release can add a
+   course to an origin that already has data. */
+const SQL_NAME = 'SQL & Snowflake';
+function scopeFromSessions(raw){
+  const mods = [];
+  for (const s of raw) if (s.module && !mods.some(m => m.name === s.module)) mods.push({ name: s.module, items: [] });
+  for (const s of raw) {
+    const m = mods.find(x => x.name === s.module);
+    if (m) m.items.push(s.label);
+  }
+  return mods.map(m => '## ' + m.name + '\n' + m.items.map(l => '- ' + l).join('\n')).join('\n\n');
+}
+async function seedDevOpsCourse(){
+  if (localStorage.getItem('ct-seeded-v1')) return null;
   try {
     const res = await fetch('devops-sessions.json', { cache: 'no-store' });
-    if (!res.ok) return;
+    if (!res.ok) return null;
     const raw = await res.json();
-    if (!Array.isArray(raw) || !raw.length) return;
+    if (!Array.isArray(raw) || !raw.length) return null;
+    if (courses.some(c => /DevOps with Multi Cloud/i.test(c.name || ''))) {
+      localStorage.setItem('ct-seeded-v1', '1');
+      return null;
+    }
     let scope = '';
     try { const s = await fetch('devops-syllabus.txt', { cache: 'no-store' }); if (s.ok) scope = await s.text(); } catch (e) {}
     const made = await db.collection('courses').add({
@@ -1446,8 +1535,36 @@ async function seedIfEmpty(){
       sessions: raw.map((s, i) => ({ id: 's' + (i + 1), label: s.label, module: s.module, done: false }))
     });
     localStorage.setItem('ct-seeded-v1', '1');
-    if (made && made.id) openCourse(made.id);
-  } catch (e) { /* leave the store empty */ }
+    return made && made.id;
+  } catch (e) { return null; /* leave the store unchanged */ }
+}
+async function seedSqlCourse(){
+  if (localStorage.getItem('ct-seeded-sql-v1')) return null;
+  try {
+    const res = await fetch('sql-sessions.json', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const raw = await res.json();
+    if (!Array.isArray(raw) || !raw.length) return null;
+    if (courses.some(c => c.name === SQL_NAME)) {
+      localStorage.setItem('ct-seeded-sql-v1', '1');
+      return null;
+    }
+    const made = await db.collection('courses').add({
+      name: SQL_NAME,
+      scope: scopeFromSessions(raw),
+      progress: 0, confidence: null, quizTotal: 0, quizCorrect: 0,
+      lessons: [], pending: null, askedQs: [], createdAt: Date.now(),
+      sessions: raw.map((s, i) => ({ id: 's' + (i + 1), label: s.label, module: s.module, minutes: s.minutes, done: false }))
+    });
+    localStorage.setItem('ct-seeded-sql-v1', '1');
+    return made && made.id;
+  } catch (e) { return null; /* leave the store unchanged */ }
+}
+async function seedCourses(){
+  const dev = await seedDevOpsCourse();
+  const sql = await seedSqlCourse();
+  const open = sql || dev;
+  if (open) openCourse(open);
 }
 
 render();
@@ -1461,7 +1578,7 @@ let firstSnap = true;
     courses = snap.docs.map(d=>({id:d.id,...d.data()}));
     if (selected && !courses.some(c=>c.id===selected)) selected=null;
     render();
-    if (firstSnap){ firstSnap = false; if (!courses.length) seedIfEmpty(); }
+    if (firstSnap){ firstSnap = false; seedCourses(); }
   }, err=>{ clearTimeout(timer); loaded=true; $('summary').textContent='Could not load courses: '+(err.message||err.code); render(); });
   if(!sample) document.querySelectorAll('[data-train],[data-quiz]').forEach(b=>b.disabled=true);
 })();
