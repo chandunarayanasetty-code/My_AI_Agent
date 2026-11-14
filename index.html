@@ -1390,7 +1390,16 @@ document.addEventListener('click', async e=>{
   else if (d.close){ selected=null; render(); }
   else if (d.del){ st(d.del).confirmDelete=true; render(); }
   else if (d.delNo){ st(selected).confirmDelete=false; render(); }
-  else if (d.delYes){ try{ await ref(d.delYes).delete(); selected=null; }catch(err){ st(d.delYes).err='Could not delete.'; render(); } }
+  else if (d.delYes){
+    const course = courses.find(x => x.id === d.delYes);
+    const name = course ? '"' + course.name + '"' : 'this course';
+    const detail = course && course.sessions && course.sessions.length
+      ? ' Its ' + course.sessions.length + ' items, lessons and quiz history will be removed.'
+      : ' Its lessons and quiz history will be removed.';
+    if (!window.confirm('Delete ' + name + ' permanently?' + detail + '\n\nThis cannot be undone.')) {
+      st(d.delYes).confirmDelete = false; render(); return;
+    }
+    try{ await ref(d.delYes).delete(); selected=null; }catch(err){ st(d.delYes).err='Could not delete.'; render(); } }
   else if (d.edit){ st(d.edit).editing=true; render(); }
   else if (d.canceledit){ st(selected).editing=false; render(); }
   else if (d.saveedit){ const v=$('editScope').value; st(selected).editing=false; await save(d.saveedit,{scope:v}); }
